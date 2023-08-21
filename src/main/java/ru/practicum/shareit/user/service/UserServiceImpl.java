@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,7 +76,7 @@ public class UserServiceImpl implements UserService {
     private void checkEmail(UserDto userDto) {
         User user = userRepository.getByEmail(userDto.getEmail());
         if (user != null) {
-            if (user.getId() != userDto.getId()) {
+            if (!Objects.equals(user.getId(), userDto.getId())) {
                 throw new UserWithEmailAlreadyExist(userDto.getEmail());
             }
         }
