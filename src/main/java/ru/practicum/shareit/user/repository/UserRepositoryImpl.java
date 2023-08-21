@@ -22,7 +22,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return  new ArrayList<>(users.values());
+        return new ArrayList<>(users.values());
     }
 
     @Override

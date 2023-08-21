@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public Item save(Item item) {
         items.compute(item.getOwnerId(), (userId, userItems) -> {
-            if(userItems == null) {
+            if (userItems == null) {
                 userItems = new ArrayList<>();
             }
             userItems.removeIf(i -> i.getId().equals(item.getId()));
@@ -58,10 +59,6 @@ public class ItemRepositoryImpl implements ItemRepository {
 
         }
 
-        return allItems.values()
-                .stream()
-                .filter(Item::getAvailable)
-                .filter(f -> f.getDescription().toLowerCase().contains(text.toLowerCase()))
-                .collect(Collectors.toList());
+        return allItems.values().stream().filter(Item::getAvailable).filter(f -> f.getDescription().toLowerCase().contains(text.toLowerCase())).collect(Collectors.toList());
     }
 }

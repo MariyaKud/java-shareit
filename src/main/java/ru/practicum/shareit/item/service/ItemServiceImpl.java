@@ -64,17 +64,17 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItemsByUserId(long userId) {
         return itemRepository.findItemsByUserId(userId)
-                             .stream()
-                             .map(itemMapper::mapperItemToDto)
-                             .collect(Collectors.toList());
+                .stream()
+                .map(itemMapper::mapperItemToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ItemDto> searchItemsByUserId(long userId, String text) {
         return itemRepository.findItemsByUserId(userId, text)
-                             .stream()
-                             .map(itemMapper::mapperItemToDto)
-                             .collect(Collectors.toList());
+                .stream()
+                .map(itemMapper::mapperItemToDto)
+                .collect(Collectors.toList());
     }
 
     private void findUserById(long userId) {
