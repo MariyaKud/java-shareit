@@ -40,8 +40,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(Long userId, UserDto userDto) {
         final User originUser = findUserById(userId);
-
         String name = userDto.getName();
+
         if (name != null && !name.isBlank()) {
             originUser.setName(name);
         }
@@ -49,9 +49,7 @@ public class UserServiceImpl implements UserService {
             checkEmail(userDto, userId);
             originUser.setEmail(userDto.getEmail());
         }
-
-        final User updateUser = userRepository.save(originUser);
-        return userMapper.mapperUserToDto(updateUser);
+        return userMapper.mapperUserToDto(originUser);
     }
 
     @Override

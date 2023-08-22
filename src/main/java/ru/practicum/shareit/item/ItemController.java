@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validation.Create;
 import ru.practicum.shareit.validation.Update;
+import ru.practicum.shareit.validation.ContextShareIt;
 
 import java.util.List;
 
@@ -25,31 +26,31 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemDto createItem(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
                                @Validated(Create.class) @RequestBody ItemDto item) {
         return itemService.createItem(userId, item);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemDto updateItem(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
                                @PathVariable Long itemId,
                                 @Validated(Update.class) @RequestBody ItemDto item) {
         return itemService.updateItem(userId, itemId, item);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemByIdForUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemDto getItemByIdForUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
                                          @PathVariable Long itemId) {
         return itemService.getItemByIdForUserId(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemDto> getItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId) {
         return itemService.getItemsByUserId(userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public List<ItemDto> searchItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
                                               @RequestParam String text) {
         return itemService.searchItemsByUserId(userId, text);
     }

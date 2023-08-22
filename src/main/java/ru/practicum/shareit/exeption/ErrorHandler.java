@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.item.exeption.ItemBelongsAnotherOwner;
 import ru.practicum.shareit.user.exeption.UserWithEmailAlreadyExist;
+import ru.practicum.shareit.validation.ContextShareIt;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
@@ -47,8 +48,8 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMissingRequestHeaderException(final MissingRequestHeaderException e) {
-        log.error("Не указан заголовок X-Sharer-User-Id {}", e.getMessage(), e);
-        return new ErrorResponse("Не указан заголовок X-Sharer-User-Id");
+        log.error("Не указан заголовок {}", e.getMessage(), e);
+        return new ErrorResponse("Не указан заголовок " + ContextShareIt.HEADER_USER_ID);
     }
 
     @ExceptionHandler
@@ -58,27 +59,11 @@ public class ErrorHandler {
         return new ErrorResponse("Такой email уже есть: " + e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler ({EntityNotFoundException.class,
+                        NoSuchElementException.class,
+                        ItemBelongsAnotherOwner.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleEntityNotFoundException(final EntityNotFoundException e) {
-        log.debug("Получен статус 404 Not found {}", e.getMessage(), e);
-        return new ErrorResponse(
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNoSuchElementException(final NoSuchElementException e) {
-        log.debug("Получен статус 404 Not found {}", e.getMessage(), e);
-        return new ErrorResponse(
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleItemBelongsAnotherOwner(final ItemBelongsAnotherOwner e) {
+    public ErrorResponse handleNotFoundException(final RuntimeException e) {
         log.debug("Получен статус 404 Not found {}", e.getMessage(), e);
         return new ErrorResponse(
                 e.getMessage()

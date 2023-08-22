@@ -32,7 +32,7 @@ public class ItemRepositoryImpl implements ItemRepository {
             if (userItems == null) {
                 userItems = new ArrayList<>();
             }
-            userItems.removeIf(i -> i.getId().equals(item.getId()));
+            //userItems.removeIf(i -> i.getId().equals(item.getId()));
             userItems.add(item);
             return userItems;
         });
@@ -54,10 +54,6 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> findItemsByUserId(long userId, String text) {
-        if (text.isBlank()) {
-            return List.of();
-        }
-
         final String strForSearch = text.toLowerCase();
 
         return allItems.values()

@@ -34,28 +34,25 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
-        final String name = itemDto.getName();
-        final String description = itemDto.getDescription();
-
         findUserById(userId);
 
-        final Item findItem = findItemById(itemId);
+        final String name = itemDto.getName();
+        final String description = itemDto.getDescription();
+        final Item updateItem = findItemById(itemId);
 
-        if (userId != findItem.getOwnerId()) {
+        if (userId != updateItem.getOwnerId()) {
             throw new ItemBelongsAnotherOwner();
         }
 
         if (name != null && !name.isBlank()) {
-            findItem.setName(name);
+            updateItem.setName(name);
         }
         if (description != null && !description.isBlank()) {
-            findItem.setDescription(description);
+            updateItem.setDescription(description);
         }
         if (itemDto.getAvailable() != null) {
-            findItem.setAvailable(itemDto.getAvailable());
+            updateItem.setAvailable(itemDto.getAvailable());
         }
-
-        Item updateItem = itemRepository.save(findItem);
 
         return itemMapper.mapperItemToDto(updateItem);
     }
@@ -76,6 +73,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItemsByUserId(long userId, String text) {
+        if (text.isBlank()) {
+            return List.of();
+        }
+
         return itemRepository.findItemsByUserId(userId, text)
                 .stream()
                 .map(itemMapper::mapperItemToDto)
