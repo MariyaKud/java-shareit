@@ -2,13 +2,12 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exeption.EntityNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.exeption.ItemBelongsAnotherOwner;
-import ru.practicum.shareit.item.exeption.ItemNotFoundById;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.exeption.UserNotFoundById;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -27,38 +26,44 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) {
         findUserById(userId);
-        Item item = itemMapper.mapperItemFromDto(userId, itemRepository.getId(), itemDto);
-        itemRepository.save(item);
-        return itemMapper.mapperItemToDto(item);
+        itemDto.setId(null);
+        final Item item = itemMapper.mapperItemFromDto(userId, itemDto);
+        final Item newItem = itemRepository.save(item);
+        return itemMapper.mapperItemToDto(newItem);
     }
 
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
+        final String name = itemDto.getName();
+        final String description = itemDto.getDescription();
+
         findUserById(userId);
-        Item findItem = findItemById(itemId);
+
+        final Item findItem = findItemById(itemId);
 
         if (userId != findItem.getOwnerId()) {
             throw new ItemBelongsAnotherOwner();
         }
-        if (itemDto.getName() == null) {
-            itemDto.setName(findItem.getName());
+
+        if (name != null && !name.isBlank()) {
+            findItem.setName(name);
         }
-        if (itemDto.getDescription() == null) {
-            itemDto.setDescription(findItem.getDescription());
+        if (description != null && !description.isBlank()) {
+            findItem.setDescription(description);
         }
-        if (itemDto.getAvailable() == null) {
-            itemDto.setAvailable(findItem.getAvailable());
+        if (itemDto.getAvailable() != null) {
+            findItem.setAvailable(itemDto.getAvailable());
         }
 
-        Item item = itemMapper.mapperItemFromDto(userId, itemId, itemDto);
-        itemRepository.save(item);
-        return itemMapper.mapperItemToDto(item);
+        Item updateItem = itemRepository.save(findItem);
+
+        return itemMapper.mapperItemToDto(updateItem);
     }
 
     @Override
     public ItemDto getItemByIdForUserId(long userId, long itemId) {
         findUserById(userId);
-        return itemMapper.mapperItemToDto(itemRepository.findItemByUserId(itemId));
+        return itemMapper.mapperItemToDto(findItemById(itemId));
     }
 
     @Override
@@ -78,17 +83,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void findUserById(long userId) {
-        final User user = userRepository.getById(userId);
-        if (user == null) {
-            throw new UserNotFoundById(userId);
-        }
+        userRepository.getById(userId)
+                       .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
     }
 
     private Item findItemById(long itemId) {
-        final Item item = itemRepository.findItemByUserId(itemId);
-        if (item == null) {
-            throw new ItemNotFoundById(itemId);
-        }
-        return item;
+        return itemRepository.geItemById(itemId)
+                              .orElseThrow(() -> new EntityNotFoundException(itemId, Item.class));
     }
 }

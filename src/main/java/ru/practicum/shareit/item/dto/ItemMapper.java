@@ -10,9 +10,9 @@ public class ItemMapper {
         return new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable());
     }
 
-    public Item mapperItemFromDto(Long userId, Long itemId, ItemDto itemDto) {
+    public Item mapperItemFromDto(Long userId, ItemDto itemDto) {
         return Item.builder()
-                .id(itemId)
+                .id(itemDto.getId())
                 .ownerId(userId)
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())

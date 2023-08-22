@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.item.exeption.ItemBelongsAnotherOwner;
-import ru.practicum.shareit.item.exeption.ItemNotFoundById;
-import ru.practicum.shareit.user.exeption.UserNotFoundById;
 import ru.practicum.shareit.user.exeption.UserWithEmailAlreadyExist;
 
 import javax.validation.ConstraintViolationException;
@@ -62,7 +60,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserNotFoundException(final UserNotFoundById e) {
+    public ErrorResponse handleEntityNotFoundException(final EntityNotFoundException e) {
         log.debug("Получен статус 404 Not found {}", e.getMessage(), e);
         return new ErrorResponse(
                 e.getMessage()
@@ -72,15 +70,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNoSuchElementException(final NoSuchElementException e) {
-        log.debug("Получен статус 404 Not found {}", e.getMessage(), e);
-        return new ErrorResponse(
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleItemNotFoundById(final ItemNotFoundById e) {
         log.debug("Получен статус 404 Not found {}", e.getMessage(), e);
         return new ErrorResponse(
                 e.getMessage()

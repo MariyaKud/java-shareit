@@ -9,9 +9,9 @@ public class UserMapper {
         return new UserDto(user.getId(), user.getName(), user.getEmail());
     }
 
-    public User mapperUserFromDto(Long userId, UserDto user) {
+    public User mapperUserFromDto(UserDto user) {
         return User.builder()
-                .id(userId)
+                .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .build();
