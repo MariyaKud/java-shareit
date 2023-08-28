@@ -1,23 +1,23 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.validation.Create;
 import ru.practicum.shareit.validation.Update;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 
 @Data
 @AllArgsConstructor
-public class ItemDto {
-    @Positive(groups = Update.class)
+public class UserDto {
+    @Positive(groups = {Create.class, Update.class})
     private Long id;
     @NotBlank(groups = Create.class)
     private String name;
-    @NotBlank(groups = Create.class)
-    private String description;
-    @NotNull(groups = Create.class)
-    private Boolean available;
+    @NotEmpty(groups = Create.class)
+    @Email(groups = {Create.class, Update.class})
+    private String email;
 }
