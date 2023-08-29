@@ -52,6 +52,6 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> searchItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
                                               @RequestParam String text) {
-        return itemService.searchItemsByUserId(userId, text);
+        return itemService.searchItemsForUserWithId(userId, text);
     }
 }

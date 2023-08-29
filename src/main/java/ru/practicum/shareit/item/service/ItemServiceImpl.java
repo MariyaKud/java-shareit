@@ -54,6 +54,8 @@ public class ItemServiceImpl implements ItemService {
             updateItem.setAvailable(itemDto.getAvailable());
         }
 
+        itemRepository.save(updateItem);
+
         return itemMapper.mapperItemToDto(updateItem);
     }
 
@@ -65,22 +67,24 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemsByUserId(long userId) {
-        return itemRepository.findById(userId)
+        return itemRepository.findByOwnerId(userId)
                 .stream()
                 .map(itemMapper::mapperItemToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> searchItemsByUserId(long userId, String text) {
-        //if (text.isBlank()) {
-        return List.of();
-        //}
+    public List<ItemDto> searchItemsForUserWithId(long userId, String text) {
+        findUserById(userId);
 
-//        return itemRepository.findByOwnerId(userId, text)
-//               .stream()
-//                .map(itemMapper::mapperItemToDto)
-//                .collect(Collectors.toList());
+        if (text.isBlank()) {
+            return List.of();
+        }
+
+        return itemRepository.findByAvailableTrueAndContainingText(text)
+               .stream()
+               .map(itemMapper::mapperItemToDto)
+               .collect(Collectors.toList());
     }
 
     private void findUserById(long userId) {

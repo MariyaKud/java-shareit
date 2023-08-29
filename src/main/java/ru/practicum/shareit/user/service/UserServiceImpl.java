@@ -29,7 +29,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         userDto.setId(null);
-        checkEmail(userDto, 0L);
         final User newUser = userMapper.mapperUserFromDto(userDto);
         userRepository.save(newUser);
         return userMapper.mapperUserToDto(newUser);
@@ -44,7 +43,6 @@ public class UserServiceImpl implements UserService {
             originUser.setName(name);
         }
         if (userDto.getEmail() != null) {
-            checkEmail(userDto, userId);
             originUser.setEmail(userDto.getEmail());
         }
         userRepository.save(originUser);
@@ -66,12 +64,5 @@ public class UserServiceImpl implements UserService {
     private User findUserById(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
-    }
-
-    private void checkEmail(UserDto userDto, Long userId) {
-        //Optional<User> user = userRepository.findByUserIdAndEmail(userId, userDto.getEmail());
-        //if (user.isPresent()) {
-        //    throw new UserWithEmailAlreadyExist(userDto.getEmail());
-        //}
     }
 }

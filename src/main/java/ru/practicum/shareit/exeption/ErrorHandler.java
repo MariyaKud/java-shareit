@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.item.exeption.ItemBelongsAnotherOwner;
-import ru.practicum.shareit.user.exeption.UserWithEmailAlreadyExist;
 import ru.practicum.shareit.validation.ContextShareIt;
 
 import javax.validation.ConstraintViolationException;
@@ -50,13 +49,6 @@ public class ErrorHandler {
     public ErrorResponse handleMissingRequestHeaderException(final MissingRequestHeaderException e) {
         log.error("Не указан заголовок {}", e.getMessage(), e);
         return new ErrorResponse("Не указан заголовок " + ContextShareIt.HEADER_USER_ID);
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleUserWithEmailAlreadyExist(final UserWithEmailAlreadyExist e) {
-        log.debug("Получен статус 409, в приложении уже зарегистрирован пользователь с email {}", e.getMessage(), e);
-        return new ErrorResponse("Такой email уже есть: " + e.getMessage());
     }
 
     @ExceptionHandler ({EntityNotFoundException.class,
