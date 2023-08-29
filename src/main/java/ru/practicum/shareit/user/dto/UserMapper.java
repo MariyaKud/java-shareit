@@ -10,10 +10,6 @@ public class UserMapper {
     }
 
     public User mapperUserFromDto(UserDto user) {
-        return User.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .build();
+        return new User(user.getId(), user.getName(), user.getEmail());
     }
 }

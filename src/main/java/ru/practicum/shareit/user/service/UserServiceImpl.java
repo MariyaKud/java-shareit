@@ -5,12 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exeption.EntityNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
-import ru.practicum.shareit.user.exeption.UserWithEmailAlreadyExist;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +47,7 @@ public class UserServiceImpl implements UserService {
             checkEmail(userDto, userId);
             originUser.setEmail(userDto.getEmail());
         }
+        userRepository.save(originUser);
         return userMapper.mapperUserToDto(originUser);
     }
 
@@ -60,18 +59,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(long userId) {
-        userRepository.delete(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId, User.class));
+        userRepository.delete(user);
     }
 
     private User findUserById(long userId) {
-        return userRepository.getById(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
     }
 
     private void checkEmail(UserDto userDto, Long userId) {
-        Optional<User> user = userRepository.getByEmailWithAnotherId(userDto.getEmail(), userId);
-        if (user.isPresent()) {
-            throw new UserWithEmailAlreadyExist(userDto.getEmail());
-        }
+        //Optional<User> user = userRepository.findByUserIdAndEmail(userId, userDto.getEmail());
+        //if (user.isPresent()) {
+        //    throw new UserWithEmailAlreadyExist(userDto.getEmail());
+        //}
     }
 }

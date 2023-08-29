@@ -65,7 +65,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemsByUserId(long userId) {
-        return itemRepository.findItemsByUserId(userId)
+        return itemRepository.findById(userId)
                 .stream()
                 .map(itemMapper::mapperItemToDto)
                 .collect(Collectors.toList());
@@ -73,23 +73,23 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItemsByUserId(long userId, String text) {
-        if (text.isBlank()) {
-            return List.of();
-        }
+        //if (text.isBlank()) {
+        return List.of();
+        //}
 
-        return itemRepository.findItemsByUserId(userId, text)
-                .stream()
-                .map(itemMapper::mapperItemToDto)
-                .collect(Collectors.toList());
+//        return itemRepository.findByOwnerId(userId, text)
+//               .stream()
+//                .map(itemMapper::mapperItemToDto)
+//                .collect(Collectors.toList());
     }
 
     private void findUserById(long userId) {
-        userRepository.getById(userId)
+        userRepository.findById(userId)
                        .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
     }
 
     private Item findItemById(long itemId) {
-        return itemRepository.geItemById(itemId)
+        return itemRepository.findById(itemId)
                               .orElseThrow(() -> new EntityNotFoundException(itemId, Item.class));
     }
 }
