@@ -22,16 +22,16 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllUsers() {
         return userRepository.findAll()
                              .stream()
-                             .map(userMapper::mapperUserToDto)
+                             .map(userMapper::toDto)
                              .collect(Collectors.toList());
     }
 
     @Override
     public UserDto createUser(UserDto userDto) {
         userDto.setId(null);
-        final User newUser = userMapper.mapperUserFromDto(userDto);
+        final User newUser = userMapper.fromDto(userDto);
         userRepository.save(newUser);
-        return userMapper.mapperUserToDto(newUser);
+        return userMapper.toDto(newUser);
     }
 
     @Override
@@ -46,13 +46,13 @@ public class UserServiceImpl implements UserService {
             originUser.setEmail(userDto.getEmail());
         }
         userRepository.save(originUser);
-        return userMapper.mapperUserToDto(originUser);
+        return userMapper.toDto(originUser);
     }
 
     @Override
     public UserDto getUserById(long userId) {
         final User user = findUserById(userId);
-        return userMapper.mapperUserToDto(user);
+        return userMapper.toDto(user);
     }
 
     @Override

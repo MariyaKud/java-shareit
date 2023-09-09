@@ -8,7 +8,13 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.practicum.shareit.booking.exeption.AttemptApprovedNotFromOwnerItem;
+import ru.practicum.shareit.booking.exeption.NoAccessBooking;
+import ru.practicum.shareit.booking.exeption.NotCorrectApproved;
+import ru.practicum.shareit.booking.exeption.NotCorrectBooking;
 import ru.practicum.shareit.item.exeption.ItemBelongsAnotherOwner;
+import ru.practicum.shareit.item.exeption.ItemUnavailable;
 import ru.practicum.shareit.validation.ContextShareIt;
 
 import javax.validation.ConstraintViolationException;
@@ -46,13 +52,30 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentTypeMismatchException e) {
+        return new ErrorResponse(String.format("Unknown %s: %s",  e.getName(), e.getValue()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMissingRequestHeaderException(final MissingRequestHeaderException e) {
         log.error("Не указан заголовок {}", e.getMessage(), e);
         return new ErrorResponse("Не указан заголовок " + ContextShareIt.HEADER_USER_ID);
     }
 
+    @ExceptionHandler({NotCorrectBooking.class,
+                       ItemUnavailable.class,
+                       NotCorrectApproved.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleAttemptApprovedNotFromOwnerItem(final RuntimeException e) {
+        log.error("Нет прав на выполняемое действие {}", e.getMessage(), e);
+        return new ErrorResponse("Нет прав: " + e.getMessage());
+    }
+
     @ExceptionHandler ({EntityNotFoundException.class,
                         NoSuchElementException.class,
+                        NoAccessBooking.class,
+                        AttemptApprovedNotFromOwnerItem.class,
                         ItemBelongsAnotherOwner.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final RuntimeException e) {
