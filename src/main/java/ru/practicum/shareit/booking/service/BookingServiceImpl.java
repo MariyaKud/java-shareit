@@ -123,7 +123,7 @@ public class BookingServiceImpl implements BookingService {
             return bookingRepository.findByBookerIdOrderByStartDesc(bookerId)
                     .stream()
                     .map(bookingMapper::toDto)
-                    .filter(b ->b.isRightState(stateBooking))
+                    .filter(b -> b.isRightState(stateBooking))
                     .collect(Collectors.toList());
 
         } else if (stateBooking == StateBooking.WAITING) {
@@ -163,7 +163,7 @@ public class BookingServiceImpl implements BookingService {
             return bookingRepository.findByOwnerIdItem(ownerId)
                     .stream()
                     .map(bookingMapper::toDto)
-                    .filter(b ->b.isRightState(stateBooking))
+                    .filter(b -> b.isRightState(stateBooking))
                     .collect(Collectors.toList());
 
         } else if (stateBooking == StateBooking.WAITING) {
@@ -202,10 +202,6 @@ public class BookingServiceImpl implements BookingService {
 
     private boolean checkItemFree(Long itemId, LocalDateTime start, LocalDateTime end) {
         List<Booking> bookings = bookingRepository.findByItemIdAndStartAndEndBetween(itemId, start, end);
-        if (bookings.size() == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return bookings.size() == 0;
     }
 }

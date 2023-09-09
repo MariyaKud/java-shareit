@@ -31,37 +31,32 @@ public class BookingController {
 
     @PostMapping
     public BookingDtoView createBooking(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                        @Validated(Create.class) @RequestBody BookingDto bookingDto) {
-        //новый запрос в статусе WAITING
+                                         @Validated(Create.class) @RequestBody BookingDto bookingDto) {
         return bookingService.createBooking(userId, bookingDto, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
     }
 
     @PatchMapping("/{bookingId}")
     public BookingDtoView approvedBooking(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                      @PathVariable Long bookingId,
-                                      @RequestParam Boolean approved) {
-        //подтверждение только владельцем
+                                           @PathVariable Long bookingId,
+                                             @RequestParam Boolean approved) {
         return bookingService.approvedBooking(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
     public BookingDtoView getBooking(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                 @PathVariable Long bookingId) {
-        //либо автор бронирования, либо владелец
+                                      @PathVariable Long bookingId) {
         return bookingService.getBookingById(userId, bookingId);
     }
 
     @GetMapping
     public List<BookingDtoView> getBookingsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                                @RequestParam(defaultValue = "ALL") StateBooking state) {
-        //отсортированы по дате от более новых к более старым
+                                                     @RequestParam(defaultValue = "ALL") StateBooking state) {
         return bookingService.getBookingsByUserId(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoView> getBookingsForItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                       @RequestParam(defaultValue = "ALL") StateBooking state) {
-        //бронь вещей пользователя
+                                                             @RequestParam(defaultValue = "ALL") StateBooking state) {
         return bookingService.getBookingsForItemsByUserId(userId, state);
     }
 }

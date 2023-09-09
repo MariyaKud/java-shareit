@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS items
   name varchar(100),
   description VARCHAR(1000),
   available BOOLEAN,
-  CONSTRAINT fk_items_to_users FOREIGN KEY(user_id) REFERENCES users(id)
+  CONSTRAINT fk_items_to_users FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
  );
 
 CREATE TABLE IF NOT EXISTS bookings
@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS bookings
   start_data timestamp,
   end_data timestamp,
   status varchar(50),
-  CONSTRAINT fk_bookings_to_users FOREIGN KEY(user_id) REFERENCES users(id),
-  CONSTRAINT fk_bookings_to_items FOREIGN KEY(item_id) REFERENCES items(id)
+  CONSTRAINT fk_bookings_to_users FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_bookings_to_items FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE
  );
 
  CREATE TABLE IF NOT EXISTS items_comments
@@ -34,6 +34,6 @@ CREATE TABLE IF NOT EXISTS bookings
    user_id BIGINT,
    text varchar(100),
    created timestamp,
-   CONSTRAINT fk_comments_to_users FOREIGN KEY(user_id) REFERENCES users(id),
-   CONSTRAINT fk_comments_to_items FOREIGN KEY(item_id) REFERENCES items(id)
+   CONSTRAINT fk_comments_to_users FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+   CONSTRAINT fk_comments_to_items FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE
  );

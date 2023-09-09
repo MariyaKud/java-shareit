@@ -19,7 +19,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
         Map<Long, List<Booking>> itemBookings = bookingRepository.findByItemsBooking(itemIds.keySet(),
                                                                    String.valueOf(StatusBooking.APPROVED))
                                                  .stream()
-                                                 .collect(Collectors.groupingBy(f-> f.getItem().getId()));
+                                                 .collect(Collectors.groupingBy(f -> f.getItem().getId()));
 
         return itemIds.entrySet()
                       .stream()

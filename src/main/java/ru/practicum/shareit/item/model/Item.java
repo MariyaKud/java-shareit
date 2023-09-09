@@ -8,9 +8,6 @@ import lombok.Setter;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -34,7 +31,6 @@ public class Item {
     private String description;
     private Boolean available;
 
-    //@OneToMany(fetch = FetchType.LAZY)
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "item_id", updatable = false, insertable = false)
     private Set<Comment> comments;

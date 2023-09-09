@@ -6,6 +6,7 @@ import lombok.Data;
 import ru.practicum.shareit.booking.model.StatusBooking;
 import ru.practicum.shareit.validation.Create;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
@@ -18,8 +19,10 @@ public class BookingDto {
     @Positive(groups = Create.class)
     private Long itemId;
     @NotNull(groups = Create.class)
+    @Future(groups = Create.class)
     private LocalDateTime start;
     @NotNull(groups = Create.class)
+    @Future(groups = Create.class)
     private LocalDateTime end;
     private StatusBooking status;
 }

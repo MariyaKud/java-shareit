@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
-import ru.practicum.shareit.item.model.Comment;
 
 import java.util.Set;
 
