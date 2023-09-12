@@ -35,14 +35,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     Optional<Booking> findBookingByIdForOwner(Long bookerId, Long ownerId);
 
-    @Query(value = "SELECT * FROM bookings " +
-            "WHERE item_id = :itemId AND " +
-            "((start_data BETWEEN :start and :end) " +
-            " OR (end_data BETWEEN :start and :end) " +
-            " OR (start_data >= :start and end_data <= :end)) " +
-            "ORDER BY start_data",
+    @Query(value = "SELECT case when count(b) > 0 then true else false end FROM bookings as b " +
+                   "WHERE b.item_id = :itemId AND " +
+                   "((b.start_data BETWEEN :start and :end) " +
+                   " OR (b.end_data BETWEEN :start and :end) " +
+                   " OR (b.start_data >= :start and b.end_data <= :end)) ",
             nativeQuery = true)
-    List<Booking> findByItemIdAndStartAndEndBetween(Long itemId, LocalDateTime start, LocalDateTime end);
+    boolean existsByItemIdInPeriodFromStartToEnd(Long itemId, LocalDateTime start, LocalDateTime end);
 
     @Query(value = "SELECT * FROM bookings " +
             "WHERE item_id in (:itemIds) AND status = :status " +

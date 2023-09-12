@@ -30,16 +30,9 @@ public class ItemMapper {
     }
 
     public ItemWithBookings toDtoWithBooking(Item item, List<Booking> bookings, LocalDateTime current) {
-        List<Booking> lasts = bookings.stream()
-                .filter(f -> !f.getStart().isAfter(current))
-                .collect(Collectors.toList());
-
-        Booking last;
-        if (lasts.size() == 0) {
-            last = null;
-        } else {
-            last = lasts.get(lasts.size() - 1);
-        }
+        Optional<Booking> last =  bookings.stream()
+                                          .filter(f -> !f.getStart().isAfter(current))
+                                          .reduce((first, second) -> second);
 
         Optional<Booking> next = bookings.stream()
                                          .filter(f -> f.getStart().isAfter(current))
@@ -52,7 +45,7 @@ public class ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .lastBooking(toDtoBooking(last))
+                .lastBooking(toDtoBooking(last.orElse(null)))
                 .nextBooking(toDtoBooking(next.orElse(null)))
                 .comments(comments)
                 .build();

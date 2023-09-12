@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.exeption.ItemBelongsAnotherOwner;
 import ru.practicum.shareit.item.exeption.ItemUnavailable;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -36,20 +37,25 @@ public class ItemServiceImpl implements ItemService {
 
     private final BookingRepository bookingRepository;
 
+    private final CommentRepository commentRepository;
+
     private final ItemMapper itemMapper;
 
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) {
         User owner = findUserById(userId);
+
         itemDto.setId(null);
+
         final Item item = itemMapper.fromDto(owner, itemDto);
         final Item newItem = itemRepository.save(item);
+
         return itemMapper.toDto(newItem);
     }
 
     @Override
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
-        findUserById(userId);
+        existsUserById(userId);
 
         final String name = itemDto.getName();
         final String description = itemDto.getDescription();
@@ -58,7 +64,6 @@ public class ItemServiceImpl implements ItemService {
         if (userId != updateItem.getOwner().getId()) {
             throw new ItemBelongsAnotherOwner();
         }
-
         if (name != null && !name.isBlank()) {
             updateItem.setName(name);
         }
@@ -79,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> bookings;
         LocalDateTime current = LocalDateTime.now();
 
-        findUserById(userId);
+        existsUserById(userId);
 
         Item item = findItemById(itemId);
         if (userId == item.getOwner().getId()) {
@@ -114,7 +119,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItemsForUserWithId(long userId, String text) {
-        findUserById(userId);
+        existsUserById(userId);
 
         if (text.isBlank()) {
             return List.of();
@@ -133,14 +138,13 @@ public class ItemServiceImpl implements ItemService {
 
         if (!bookingRepository.existsByBookerIdAndItemIdAndEndBeforeAndStatus(userId, itemId,
                                 current, StatusBooking.APPROVED)) {
+
             throw new ItemUnavailable(itemId);
 
         } else {
-            Comment comment = itemMapper.commentFromDto(commentDto, item, author, current);
-            item.getComments().add(comment);
 
-            Item newItem = itemRepository.save(item);
-            comment.setId(getIdForComment(newItem));
+            Comment comment = commentRepository.save(itemMapper.commentFromDto(commentDto, item, author, current));
+            item.getComments().add(comment);
 
             return  itemMapper.commentToDto(comment);
         }
@@ -153,10 +157,12 @@ public class ItemServiceImpl implements ItemService {
 
     private Item findItemById(long itemId) {
         return itemRepository.findById(itemId)
-                              .orElseThrow(() -> new EntityNotFoundException(itemId, Item.class));
+                             .orElseThrow(() -> new EntityNotFoundException(itemId, Item.class));
     }
 
-    private long getIdForComment(Item item) {
-        return item.getComments().size();
+    private void existsUserById(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException(userId, User.class);
+        }
     }
 }

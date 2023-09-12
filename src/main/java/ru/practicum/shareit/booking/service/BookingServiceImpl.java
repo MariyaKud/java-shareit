@@ -23,7 +23,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -96,109 +95,65 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDtoView> getBookingsByUserId(Long bookerId, StateBooking stateBooking) {
         final LocalDateTime current = LocalDateTime.now();
+        List<Booking> result;
         findUserById(bookerId);
 
-        if (stateBooking == StateBooking.ALL) {
-
-            return bookingRepository.findByBookerIdOrderByStartDesc(bookerId)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.CURRENT) {
-
-            return bookingRepository.findByBookerIdAndStateCurrentOrderByStartDesc(bookerId, current)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.FUTURE) {
-
-            return bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(bookerId, current)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.PAST) {
-
-            return bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(bookerId, current)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.WAITING) {
-
-            return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, StatusBooking.WAITING)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.REJECTED) {
-
-            return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, StatusBooking.REJECTED)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else {
-
-            throw new EntityNotFoundException(0L, StateBooking.class);
-
+        switch (stateBooking) {
+            case ALL:
+                result = bookingRepository.findByBookerIdOrderByStartDesc(bookerId);
+                break;
+            case CURRENT:
+                result = bookingRepository.findByBookerIdAndStateCurrentOrderByStartDesc(bookerId, current);
+                break;
+            case FUTURE:
+                result = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(bookerId, current);
+                break;
+            case PAST:
+                result = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(bookerId, current);
+                break;
+            case WAITING:
+                result = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, StatusBooking.WAITING);
+                break;
+            case REJECTED:
+                result = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, StatusBooking.REJECTED);
+                break;
+            default:
+                throw new EntityNotFoundException(0L, StateBooking.class);
         }
+
+        return bookingMapper.bookingsToDto(result);
     }
 
     @Override
     public List<BookingDtoView> getBookingsForItemsByUserId(Long ownerId, StateBooking stateBooking) {
         final LocalDateTime current = LocalDateTime.now();
+        List<Booking> result;
         findUserById(ownerId);
 
-        if (stateBooking == StateBooking.ALL) {
-
-            return bookingRepository.findByOwnerIdItem(ownerId)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.CURRENT) {
-
-            return bookingRepository.findByOwnerIdItemCurrent(ownerId, current)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.FUTURE) {
-
-            return bookingRepository.findByOwnerIdItemFuture(ownerId, current)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.PAST) {
-
-            return bookingRepository.findByOwnerIdItemPast(ownerId, current)
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.WAITING) {
-
-            return bookingRepository.findByOwnerIdItemAndStatus(ownerId, String.valueOf(StatusBooking.WAITING))
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else if (stateBooking == StateBooking.REJECTED) {
-
-            return bookingRepository.findByOwnerIdItemAndStatus(ownerId, String.valueOf(StatusBooking.REJECTED))
-                    .stream()
-                    .map(bookingMapper::toDto)
-                    .collect(Collectors.toList());
-
-        } else {
-
-            throw new EntityNotFoundException(0L, StateBooking.class);
-
+        switch (stateBooking) {
+            case ALL:
+                result = bookingRepository.findByOwnerIdItem(ownerId);
+                break;
+            case CURRENT:
+                result = bookingRepository.findByOwnerIdItemCurrent(ownerId, current);
+                break;
+            case FUTURE:
+                result = bookingRepository.findByOwnerIdItemFuture(ownerId, current);
+                break;
+            case PAST:
+                result = bookingRepository.findByOwnerIdItemPast(ownerId, current);
+                break;
+            case WAITING:
+                result = bookingRepository.findByOwnerIdItemAndStatus(ownerId, String.valueOf(StatusBooking.WAITING));
+                break;
+            case REJECTED:
+                result = bookingRepository.findByOwnerIdItemAndStatus(ownerId, String.valueOf(StatusBooking.REJECTED));
+                break;
+            default:
+                throw new EntityNotFoundException(0L, StateBooking.class);
         }
+
+        return bookingMapper.bookingsToDto(result);
     }
 
     private User findUserById(long userId) {
@@ -222,7 +177,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean checkItemFree(Long itemId, LocalDateTime start, LocalDateTime end) {
-        List<Booking> bookings = bookingRepository.findByItemIdAndStartAndEndBetween(itemId, start, end);
-        return bookings.size() == 0;
+        return !bookingRepository.existsByItemIdInPeriodFromStartToEnd(itemId, start, end);
     }
 }
