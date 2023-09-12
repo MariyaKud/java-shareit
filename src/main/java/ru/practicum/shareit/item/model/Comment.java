@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,7 +34,6 @@ public class Comment {
     private final User author;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id", nullable = false)
-    @JsonIgnore
     private final Item item;
     private String text;
     private LocalDateTime created;

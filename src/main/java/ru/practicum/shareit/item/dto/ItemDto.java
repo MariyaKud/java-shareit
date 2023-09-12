@@ -10,6 +10,7 @@ import ru.practicum.shareit.validation.Update;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
@@ -19,8 +20,10 @@ public class ItemDto {
     @Positive(groups = Update.class)
     private Long id;
     @NotBlank(groups = Create.class)
+    @Size(min = 1, max = 100, groups = {Update.class,Create.class})
     private String name;
     @NotBlank(groups = Create.class)
+    @Size(min = 1, max = 1000, groups = {Update.class,Create.class})
     private String description;
     @NotNull(groups = Create.class)
     private Boolean available;

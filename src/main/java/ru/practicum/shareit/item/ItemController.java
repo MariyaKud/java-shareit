@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoShort;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookings;
 import ru.practicum.shareit.item.service.ItemService;
@@ -19,6 +21,7 @@ import ru.practicum.shareit.validation.Create;
 import ru.practicum.shareit.validation.Update;
 import ru.practicum.shareit.validation.ContextShareIt;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -61,7 +64,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public CommentDto createComment(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
                                      @PathVariable Long itemId,
-                                      @Validated @RequestBody CommentDto commentDto) {
+                                      @RequestBody @Valid CommentDtoShort commentDto) {
         return itemService.createComment(userId, itemId, commentDto, LocalDateTime.now());
     }
 }

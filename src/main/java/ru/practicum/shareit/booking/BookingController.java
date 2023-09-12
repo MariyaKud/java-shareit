@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +16,8 @@ import ru.practicum.shareit.booking.dto.BookingDtoView;
 import ru.practicum.shareit.booking.model.StateBooking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.validation.ContextShareIt;
-import ru.practicum.shareit.validation.Create;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -31,7 +30,7 @@ public class BookingController {
 
     @PostMapping
     public BookingDtoView createBooking(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                         @Validated(Create.class) @RequestBody BookingDto bookingDto) {
+                                        @RequestBody @Valid BookingDto bookingDto) {
         return bookingService.createBooking(userId, bookingDto, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
     }
 

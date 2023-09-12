@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS bookings
  ( id      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
    item_id BIGINT,
    user_id BIGINT,
-   text varchar(100),
+   text varchar(1000),
    created timestamp,
    CONSTRAINT fk_comments_to_users FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
    CONSTRAINT fk_comments_to_items FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE

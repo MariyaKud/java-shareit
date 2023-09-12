@@ -31,10 +31,9 @@ public class ItemMapper {
 
     public ItemWithBookings toDtoWithBooking(Item item, List<Booking> bookings, LocalDateTime current) {
         List<Booking> lasts = bookings.stream()
-                .filter(f -> (f.getStart().isBefore(current) && f.getEnd().isAfter(current))
-                        || f.getEnd().equals(current) || f.getStart().equals(current)
-                        || f.getEnd().isBefore(current))
+                .filter(f -> !f.getStart().isAfter(current))
                 .collect(Collectors.toList());
+
         Booking last;
         if (lasts.size() == 0) {
             last = null;
@@ -43,9 +42,8 @@ public class ItemMapper {
         }
 
         Optional<Booking> next = bookings.stream()
-                .filter(f -> f.getStart().isAfter(current)
-                        && f.getEnd().isAfter(current))
-                .findFirst();
+                                         .filter(f -> f.getStart().isAfter(current))
+                                         .findFirst();
 
         Set<CommentDto> comments = item.getComments().stream().map(this::commentToDto).collect(Collectors.toSet());
 
@@ -70,21 +68,6 @@ public class ItemMapper {
                 .build();
     }
 
-    public Comment commentFromDto(CommentDto commentDto, Item item, User author) {
-        return Comment.builder()
-                .id(commentDto.getId())
-                .text(commentDto.getText())
-                .author(author)
-                .item(item)
-                .created(commentDto.getCreated())
-                .build();
-
-    }
-
-    private CommentDto commentToDto(Comment comment) {
-        return new CommentDto(comment.getId(), comment.getText(), comment.getAuthor().getName(), comment.getCreated());
-    }
-
     private static BookingDtoShort toDtoBooking(Booking booking) {
         if (booking == null) {
             return null;
@@ -96,5 +79,18 @@ public class ItemMapper {
                     .bookerId(booking.getBooker().getId())
                     .build();
         }
+    }
+
+    public Comment commentFromDto(CommentDtoShort commentDto, Item item, User author, LocalDateTime created) {
+        return Comment.builder()
+                .text(commentDto.getText())
+                .author(author)
+                .item(item)
+                .created(created)
+                .build();
+    }
+
+    public CommentDto commentToDto(Comment comment) {
+        return new CommentDto(comment.getId(), comment.getText(), comment.getAuthor().getName(), comment.getCreated());
     }
 }

@@ -53,6 +53,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentTypeMismatchException e) {
+        log.error("Ошибка валидации {}", e.getMessage(), e);
         return new ErrorResponse(String.format("Unknown %s: %s",  e.getName(), e.getValue()));
     }
 

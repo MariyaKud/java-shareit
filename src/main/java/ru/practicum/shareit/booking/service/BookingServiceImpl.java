@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.exeption.AttemptApprovedNotFromOwnerItem;
 import ru.practicum.shareit.booking.exeption.NoAccessBooking;
 import ru.practicum.shareit.booking.exeption.NotCorrectApproved;
-import ru.practicum.shareit.booking.exeption.NotCorrectBooking;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.StateBooking;
 import ru.practicum.shareit.booking.model.StatusBooking;
@@ -49,10 +48,6 @@ public class BookingServiceImpl implements BookingService {
             throw new ItemUnavailable(item.getId());
         }
 
-        if (start.isBefore(current) || end.isBefore(start) || end.equals(start)) {
-            throw new NotCorrectBooking(bookingDto.getStart(), bookingDto.getEnd());
-        }
-
         if (!checkItemFree(item.getId(), start, end)) {
             throw new NoAccessBooking(bookerId, item.getId());
         }
@@ -62,9 +57,9 @@ public class BookingServiceImpl implements BookingService {
         }
 
         bookingDto.setId(null);
-        bookingDto.setStatus(StatusBooking.WAITING);
 
-        final Booking newBooking = bookingRepository.save(bookingMapper.fromDto(bookingDto, booker, item));
+        final Booking newBooking = bookingRepository.save(bookingMapper.fromDto(bookingDto, booker,
+                                                           item, StatusBooking.WAITING));
 
         return bookingMapper.toDto(newBooking);
     }
@@ -95,18 +90,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDtoView getBookingById(Long ownerId, Long bookingId) {
-        final Booking booking = findBookingById(bookingId);
-
-        if (!Objects.equals(ownerId, booking.getBooker().getId()) &&
-                !Objects.equals(ownerId, booking.getItem().getOwner().getId())) {
-            throw new NoAccessBooking(ownerId, bookingId);
-        }
-
-        return bookingMapper.toDto(booking);
+        return bookingMapper.toDto(findBookingByIdForOwner(bookingId, ownerId));
     }
 
     @Override
     public List<BookingDtoView> getBookingsByUserId(Long bookerId, StateBooking stateBooking) {
+        final LocalDateTime current = LocalDateTime.now();
         findUserById(bookerId);
 
         if (stateBooking == StateBooking.ALL) {
@@ -116,14 +105,25 @@ public class BookingServiceImpl implements BookingService {
                     .map(bookingMapper::toDto)
                     .collect(Collectors.toList());
 
-        } else if (stateBooking == StateBooking.CURRENT ||
-                    stateBooking == StateBooking.FUTURE ||
-                     stateBooking == StateBooking.PAST) {
+        } else if (stateBooking == StateBooking.CURRENT) {
 
-            return bookingRepository.findByBookerIdOrderByStartDesc(bookerId)
+            return bookingRepository.findByBookerIdAndStateCurrentOrderByStartDesc(bookerId, current)
                     .stream()
                     .map(bookingMapper::toDto)
-                    .filter(b -> b.isRightState(stateBooking))
+                    .collect(Collectors.toList());
+
+        } else if (stateBooking == StateBooking.FUTURE) {
+
+            return bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(bookerId, current)
+                    .stream()
+                    .map(bookingMapper::toDto)
+                    .collect(Collectors.toList());
+
+        } else if (stateBooking == StateBooking.PAST) {
+
+            return bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(bookerId, current)
+                    .stream()
+                    .map(bookingMapper::toDto)
                     .collect(Collectors.toList());
 
         } else if (stateBooking == StateBooking.WAITING) {
@@ -141,12 +141,15 @@ public class BookingServiceImpl implements BookingService {
                     .collect(Collectors.toList());
 
         } else {
+
             throw new EntityNotFoundException(0L, StateBooking.class);
+
         }
     }
 
     @Override
     public List<BookingDtoView> getBookingsForItemsByUserId(Long ownerId, StateBooking stateBooking) {
+        final LocalDateTime current = LocalDateTime.now();
         findUserById(ownerId);
 
         if (stateBooking == StateBooking.ALL) {
@@ -156,14 +159,25 @@ public class BookingServiceImpl implements BookingService {
                     .map(bookingMapper::toDto)
                     .collect(Collectors.toList());
 
-        } else if (stateBooking == StateBooking.CURRENT ||
-                stateBooking == StateBooking.FUTURE ||
-                stateBooking == StateBooking.PAST) {
+        } else if (stateBooking == StateBooking.CURRENT) {
 
-            return bookingRepository.findByOwnerIdItem(ownerId)
+            return bookingRepository.findByOwnerIdItemCurrent(ownerId, current)
                     .stream()
                     .map(bookingMapper::toDto)
-                    .filter(b -> b.isRightState(stateBooking))
+                    .collect(Collectors.toList());
+
+        } else if (stateBooking == StateBooking.FUTURE) {
+
+            return bookingRepository.findByOwnerIdItemFuture(ownerId, current)
+                    .stream()
+                    .map(bookingMapper::toDto)
+                    .collect(Collectors.toList());
+
+        } else if (stateBooking == StateBooking.PAST) {
+
+            return bookingRepository.findByOwnerIdItemPast(ownerId, current)
+                    .stream()
+                    .map(bookingMapper::toDto)
                     .collect(Collectors.toList());
 
         } else if (stateBooking == StateBooking.WAITING) {
@@ -181,7 +195,9 @@ public class BookingServiceImpl implements BookingService {
                     .collect(Collectors.toList());
 
         } else {
+
             throw new EntityNotFoundException(0L, StateBooking.class);
+
         }
     }
 
@@ -197,6 +213,11 @@ public class BookingServiceImpl implements BookingService {
 
     private Booking findBookingById(long bookingId) {
         return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException(bookingId, Booking.class));
+    }
+
+    private Booking findBookingByIdForOwner(long bookingId, Long ownerId) {
+        return bookingRepository.findBookingByIdForOwner(bookingId, ownerId)
                 .orElseThrow(() -> new EntityNotFoundException(bookingId, Booking.class));
     }
 

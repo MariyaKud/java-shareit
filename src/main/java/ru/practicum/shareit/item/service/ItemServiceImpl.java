@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.model.StatusBooking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exeption.EntityNotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoShort;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemWithBookings;
@@ -93,7 +94,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemWithBookings> getItemsByUserId(long userId) {
-
         LocalDateTime current = LocalDateTime.now();
 
         Map<Long, Item>  itemIds = itemRepository.findByOwnerIdOrderById(userId)
@@ -127,25 +127,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentDto createComment(long userId, long itemId, CommentDto commentDto, LocalDateTime current) {
-        List<Booking> bookings = bookingRepository.findByBookerIdAndItemIdAndStatus(userId, itemId,
-                                                    String.valueOf(StatusBooking.APPROVED), current);
+    public CommentDto createComment(long userId, long itemId, CommentDtoShort commentDto, LocalDateTime current) {
         User author = findUserById(userId);
         Item item = findItemById(itemId);
 
-        if (bookings.size() == 0) {
+        if (!bookingRepository.existsByBookerIdAndItemIdAndEndBeforeAndStatus(userId, itemId,
+                                current, StatusBooking.APPROVED)) {
             throw new ItemUnavailable(itemId);
-        } else {
-            commentDto.setCreated(current);
-            commentDto.setAuthorName(author.getName());
 
-            Comment comment = itemMapper.commentFromDto(commentDto, item, author);
+        } else {
+            Comment comment = itemMapper.commentFromDto(commentDto, item, author, current);
             item.getComments().add(comment);
 
             Item newItem = itemRepository.save(item);
-            commentDto.setId(getIdForComment(newItem));
+            comment.setId(getIdForComment(newItem));
 
-            return  commentDto;
+            return  itemMapper.commentToDto(comment);
         }
     }
 
@@ -160,10 +157,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private long getIdForComment(Item item) {
-        return item.getComments()
-                .stream()
-                .mapToLong(Comment::getId)
-                .max()
-                .orElse(0);
+        return item.getComments().size();
     }
 }

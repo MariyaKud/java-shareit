@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
         if (name != null && !name.isBlank()) {
             originUser.setName(name);
         }
-        if (userDto.getEmail() != null) {
+        if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
             originUser.setEmail(userDto.getEmail());
         }
         userRepository.save(originUser);
