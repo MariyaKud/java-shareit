@@ -136,6 +136,7 @@ public class ItemServiceImpl implements ItemService {
         User author = findUserById(userId);
         Item item = findItemById(itemId);
 
+
         if (!bookingRepository.existsByBookerIdAndItemIdAndEndBeforeAndStatus(userId, itemId,
                                 current, StatusBooking.APPROVED)) {
 

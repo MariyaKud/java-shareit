@@ -103,7 +103,7 @@ public class BookingServiceImpl implements BookingService {
                 result = bookingRepository.findByBookerIdOrderByStartDesc(bookerId);
                 break;
             case CURRENT:
-                result = bookingRepository.findByBookerIdAndStateCurrentOrderByStartDesc(bookerId, current);
+                result = bookingRepository.findByBookerIdAndStateCurrent(bookerId, current);
                 break;
             case FUTURE:
                 result = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(bookerId, current);

@@ -23,9 +23,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "SELECT * FROM bookings " +
                    "WHERE user_id = :bookerId AND " +
                    "start_data <= :current AND end_data >= :current " +
-                   "ORDER BY start_data",
+                   "ORDER BY start_data DESC",
             nativeQuery = true)
-    List<Booking> findByBookerIdAndStateCurrentOrderByStartDesc(Long bookerId, LocalDateTime current);
+    List<Booking> findByBookerIdAndStateCurrent(Long bookerId, LocalDateTime current);
 
     List<Booking> findByBookerIdAndStatusOrderByStartDesc(Long bookerId, StatusBooking status);
 
@@ -35,7 +35,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     Optional<Booking> findBookingByIdForOwner(Long bookerId, Long ownerId);
 
-    @Query(value = "SELECT case when count(b) > 0 then true else false end FROM bookings as b " +
+    @Query(value = "SELECT case when count(b.id) > 0 then true else false end FROM bookings as b " +
                    "WHERE b.item_id = :itemId AND " +
                    "((b.start_data BETWEEN :start and :end) " +
                    " OR (b.end_data BETWEEN :start and :end) " +
