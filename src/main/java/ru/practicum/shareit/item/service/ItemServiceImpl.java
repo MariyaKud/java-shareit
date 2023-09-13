@@ -143,14 +143,11 @@ public class ItemServiceImpl implements ItemService {
 
         } else {
 
-            //Comment comment = commentRepository.save(itemMapper.commentFromDto(commentDto, item, author, current));
-            Comment comment = itemMapper.commentFromDto(commentDto, item, author, current);
+            Comment comment = commentRepository.save(itemMapper.commentFromDto(commentDto, item, author, current));
+
             item.getComments().add(comment);
 
             itemRepository.save(item);
-            comment.setId(item.getComments().stream()
-                   .reduce((first, second) -> second)
-                   .orElseThrow(() -> new EntityNotFoundException(0L, Comment.class)).getId());
 
             return  itemMapper.commentToDto(comment);
         }
