@@ -5,12 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exeption.EntityNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
-import ru.practicum.shareit.user.exeption.UserWithEmailAlreadyExist;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,17 +22,16 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllUsers() {
         return userRepository.findAll()
                              .stream()
-                             .map(userMapper::mapperUserToDto)
+                             .map(userMapper::toDto)
                              .collect(Collectors.toList());
     }
 
     @Override
     public UserDto createUser(UserDto userDto) {
         userDto.setId(null);
-        checkEmail(userDto, 0L);
-        final User newUser = userMapper.mapperUserFromDto(userDto);
+        final User newUser = userMapper.fromDto(userDto);
         userRepository.save(newUser);
-        return userMapper.mapperUserToDto(newUser);
+        return userMapper.toDto(newUser);
     }
 
     @Override
@@ -45,33 +42,27 @@ public class UserServiceImpl implements UserService {
         if (name != null && !name.isBlank()) {
             originUser.setName(name);
         }
-        if (userDto.getEmail() != null) {
-            checkEmail(userDto, userId);
+        if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
             originUser.setEmail(userDto.getEmail());
         }
-        return userMapper.mapperUserToDto(originUser);
+        userRepository.save(originUser);
+        return userMapper.toDto(originUser);
     }
 
     @Override
     public UserDto getUserById(long userId) {
         final User user = findUserById(userId);
-        return userMapper.mapperUserToDto(user);
+        return userMapper.toDto(user);
     }
 
     @Override
     public void deleteUserById(long userId) {
-        userRepository.delete(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId, User.class));
+        userRepository.delete(user);
     }
 
     private User findUserById(long userId) {
-        return userRepository.getById(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
-    }
-
-    private void checkEmail(UserDto userDto, Long userId) {
-        Optional<User> user = userRepository.getByEmailWithAnotherId(userDto.getEmail(), userId);
-        if (user.isPresent()) {
-            throw new UserWithEmailAlreadyExist(userDto.getEmail());
-        }
     }
 }
