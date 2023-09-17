@@ -1,9 +1,11 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingDtoView;
+import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.exeption.AttemptApprovedNotFromOwnerItem;
 import ru.practicum.shareit.booking.exeption.NoAccessBooking;
@@ -36,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
 
     @Override
-    public BookingDtoView createBooking(Long bookerId, BookingDto bookingDto, LocalDateTime current) {
+    public BookingDtoOut createBooking(Long bookerId, BookingDto bookingDto, LocalDateTime current) {
         final User booker = findUserById(bookerId);
         final Item item = findItemById(bookingDto.getItemId());
 
@@ -58,13 +60,13 @@ public class BookingServiceImpl implements BookingService {
         bookingDto.setId(null);
 
         final Booking newBooking = bookingRepository.save(bookingMapper.fromDto(bookingDto, booker,
-                                                           item, StatusBooking.WAITING));
+                                                                         item, StatusBooking.WAITING));
 
         return bookingMapper.toDto(newBooking);
     }
 
     @Override
-    public BookingDtoView approvedBooking(Long userId, Long bookingId, Boolean approved) {
+    public BookingDtoOut approvedBooking(Long userId, Long bookingId, Boolean approved) {
         findUserById(userId);
 
         final Booking booking = findBookingById(bookingId);
@@ -88,34 +90,37 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDtoView getBookingById(Long ownerId, Long bookingId) {
+    public BookingDtoOut getBookingById(Long ownerId, Long bookingId) {
         return bookingMapper.toDto(findBookingByIdForOwner(bookingId, ownerId));
     }
 
     @Override
-    public List<BookingDtoView> getBookingsByUserId(Long bookerId, StateBooking stateBooking) {
+    public List<BookingDtoOut> getBookingsByBookerId(Long bookerId, StateBooking stateBooking, int from, int size) {
         final LocalDateTime current = LocalDateTime.now();
-        List<Booking> result;
+        Page<Booking> result;
         findUserById(bookerId);
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
 
         switch (stateBooking) {
             case ALL:
-                result = bookingRepository.findByBookerIdOrderByStartDesc(bookerId);
+                result = bookingRepository.findByBookerIdOrderByStartDesc(bookerId, page);
                 break;
             case CURRENT:
-                result = bookingRepository.findByBookerIdAndStateCurrent(bookerId, current);
+                result = bookingRepository.findByBookerIdAndStateCurrentOrderByStartDesc(bookerId, current, page);
                 break;
             case FUTURE:
-                result = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(bookerId, current);
+                result = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(bookerId, current, page);
                 break;
             case PAST:
-                result = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(bookerId, current);
+                result = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(bookerId, current, page);
                 break;
             case WAITING:
-                result = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, StatusBooking.WAITING);
+                result = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId,
+                                                                                    StatusBooking.WAITING, page);
                 break;
             case REJECTED:
-                result = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId, StatusBooking.REJECTED);
+                result = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId,
+                                                                                    StatusBooking.REJECTED, page);
                 break;
             default:
                 throw new EntityNotFoundException(0L, StateBooking.class);
@@ -125,29 +130,32 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoView> getBookingsForItemsByUserId(Long ownerId, StateBooking stateBooking) {
+    public List<BookingDtoOut> getBookingsByOwnerId(Long ownerId, StateBooking stateBooking, int from, int size) {
         final LocalDateTime current = LocalDateTime.now();
-        List<Booking> result;
+        Page<Booking> result;
         findUserById(ownerId);
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
 
         switch (stateBooking) {
             case ALL:
-                result = bookingRepository.findByOwnerIdItem(ownerId);
+                result = bookingRepository.findByOwnerIdItem(ownerId, page);
                 break;
             case CURRENT:
-                result = bookingRepository.findByOwnerIdItemCurrent(ownerId, current);
+                result = bookingRepository.findByOwnerIdItemCurrent(ownerId, current, page);
                 break;
             case FUTURE:
-                result = bookingRepository.findByOwnerIdItemFuture(ownerId, current);
+                result = bookingRepository.findByOwnerIdItemFuture(ownerId, current, page);
                 break;
             case PAST:
-                result = bookingRepository.findByOwnerIdItemPast(ownerId, current);
+                result = bookingRepository.findByOwnerIdItemPast(ownerId, current, page);
                 break;
             case WAITING:
-                result = bookingRepository.findByOwnerIdItemAndStatus(ownerId, String.valueOf(StatusBooking.WAITING));
+                result = bookingRepository.findByOwnerIdItemAndStatus(ownerId,
+                                                                       String.valueOf(StatusBooking.WAITING), page);
                 break;
             case REJECTED:
-                result = bookingRepository.findByOwnerIdItemAndStatus(ownerId, String.valueOf(StatusBooking.REJECTED));
+                result = bookingRepository.findByOwnerIdItemAndStatus(ownerId,
+                                                                       String.valueOf(StatusBooking.REJECTED), page);
                 break;
             default:
                 throw new EntityNotFoundException(0L, StateBooking.class);
