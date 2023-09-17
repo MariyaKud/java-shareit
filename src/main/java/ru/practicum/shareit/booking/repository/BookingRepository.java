@@ -72,7 +72,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "SELECT * FROM bookings " +
             "WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) AND " +
             "start_data <= :current AND end_data >= :current " +
-            "ORDER BY start_data DESC ",
+            "ORDER BY start_data DESC",
             nativeQuery = true)
     List<Booking> findByOwnerIdItemCurrent(Long ownerId, LocalDateTime current);
 

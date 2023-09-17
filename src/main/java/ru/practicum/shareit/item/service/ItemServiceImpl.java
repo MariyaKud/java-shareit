@@ -17,6 +17,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,6 +42,8 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
+    private final ItemRequestRepository requestRepository;
+
     private final ItemMapper itemMapper;
 
     @Override
@@ -48,6 +53,12 @@ public class ItemServiceImpl implements ItemService {
         itemDto.setId(null);
 
         final Item item = itemMapper.fromDto(owner, itemDto);
+
+        if (itemDto.getRequestId() != null) {
+            Optional<ItemRequest> itemRequest = requestRepository.findById(itemDto.getRequestId());
+            itemRequest.ifPresent(item::setRequest);
+        }
+
         final Item newItem = itemRepository.save(item);
 
         return itemMapper.toDto(newItem);
