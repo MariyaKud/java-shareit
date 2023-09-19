@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
-import ru.practicum.shareit.request.dto.itemRequestDtoWithItems;
+import ru.practicum.shareit.request.dto.ItemRequestDtoWithItems;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.validation.ContextShareIt;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,19 +37,19 @@ public class ItemRequestController {
     }
 
     @GetMapping
-    public List<itemRequestDtoWithItems> getMyItemRequests(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId) {
+    public List<ItemRequestDtoWithItems> getMyItemRequests(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId) {
         return itemRequestService.getMyItemRequests(userId);
     }
 
     @GetMapping("/all")
-    public List<itemRequestDtoWithItems> getAllItemRequests(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                                            @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                            @RequestParam(defaultValue = "10") @Min(0) int size) {
+    public List<ItemRequestDtoWithItems> getAllItemRequests(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
+                                        @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                        @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return itemRequestService.getAllItemRequests(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
-    public itemRequestDtoWithItems getItemByIdForUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
+    public ItemRequestDtoWithItems getItemByIdForUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
                                                         @PathVariable Long requestId) {
         return itemRequestService.getRequestById(userId, requestId);
     }

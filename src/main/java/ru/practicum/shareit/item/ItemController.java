@@ -22,6 +22,9 @@ import ru.practicum.shareit.validation.Update;
 import ru.practicum.shareit.validation.ContextShareIt;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -51,14 +54,18 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemWithBookings> getItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId) {
-        return itemService.getItemsByUserId(userId);
+    public List<ItemWithBookings> getItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
+                                        @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                    @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return itemService.getItemsByUserId(userId, from, size);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                              @RequestParam String text) {
-        return itemService.searchItemsForUserWithId(userId, text);
+                                           @RequestParam String text,
+                                        @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                     @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return itemService.searchItemsForUserWithId(userId, text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

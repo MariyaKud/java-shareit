@@ -22,6 +22,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Validated
@@ -52,17 +54,17 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoOut> getBookingsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                                @RequestParam(defaultValue = "ALL") StateBooking state,
-                                                @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                @RequestParam(defaultValue = "10") @Min(0) int size) {
+                                             @RequestParam(defaultValue = "ALL") StateBooking state,
+                                          @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                        @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return bookingService.getBookingsByBookerId(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoOut> getBookingsForItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                                @RequestParam(defaultValue = "ALL") StateBooking state,
-                                                @RequestParam(defaultValue = "0") @Min(0) int from,
-                                                @RequestParam(defaultValue = "10") @Min(0) int size) {
+                                                   @RequestParam(defaultValue = "ALL") StateBooking state,
+                                          @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                        @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return bookingService.getBookingsByOwnerId(userId, state, from, size);
     }
 }

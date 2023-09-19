@@ -30,21 +30,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     List<Booking> findByItemsBooking(Set<Long> itemIds, String status);
 
-    Page<Booking> findByBookerIdOrderByStartDesc(Long bookerId, Pageable pageable);
+    Page<Booking> findByBookerId(Long bookerId, Pageable pageable);
 
-    Page<Booking> findByBookerIdAndEndBeforeOrderByStartDesc(Long bookerId, LocalDateTime current, Pageable pageable);
+    Page<Booking> findByBookerIdAndEndBefore(Long bookerId, LocalDateTime current, Pageable pageable);
 
-    Page<Booking> findByBookerIdAndStartAfterOrderByStartDesc(Long bookerId, LocalDateTime current, Pageable pageable);
+    Page<Booking> findByBookerIdAndStartAfter(Long bookerId, LocalDateTime current, Pageable pageable);
 
-    Page<Booking> findByBookerIdAndStatusOrderByStartDesc(Long bookerId, StatusBooking status, Pageable pageable);
+    Page<Booking> findByBookerIdAndStatus(Long bookerId, StatusBooking status, Pageable pageable);
 
-    @Query(value = "SELECT * FROM bookings " +
-                   "WHERE user_id = :bookerId AND " +
-                   "start_data <= :current AND end_data >= :current " +
-                   "ORDER BY start_data DESC",
-            nativeQuery = true)
-    Page<Booking> findByBookerIdAndStateCurrentOrderByStartDesc(Long bookerId, LocalDateTime current,
-                                                                Pageable pageable);
+    Page<Booking> findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(Long bookerId, LocalDateTime start,
+                                                                            LocalDateTime end, Pageable pageable);
 
     @Query(value = "SELECT * FROM bookings as b " +
                    "JOIN items as i on b.item_id = i.id " +
@@ -52,36 +47,36 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     Optional<Booking> findBookingByIdForOwner(Long bookerId, Long ownerId);
 
-    @Query(value = "SELECT * FROM bookings " +
-            "WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) " +
-            "ORDER BY start_data DESC",
-            nativeQuery = true)
-    Page<Booking> findByOwnerIdItem(Long ownerId, Pageable pageable);
+    @Query(value = "SELECT * FROM bookings WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId)",
+          countQuery = "SELECT count(*) FROM bookings WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId)",
+          nativeQuery = true)
+    Page<Booking> findByOwnerId(Long ownerId, Pageable pageable);
 
-    @Query(value = "SELECT * FROM bookings " +
-            "WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) AND " +
-            "start_data <= :current AND end_data >= :current " +
-            "ORDER BY start_data DESC",
-            nativeQuery = true)
-    Page<Booking> findByOwnerIdItemCurrent(Long ownerId, LocalDateTime current, Pageable pageable);
+    @Query(value = "SELECT * FROM bookings WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) AND " +
+                   "start_data <= :current AND end_data >= :current ",
+    countQuery = "SELECT count(*) FROM bookings WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) AND " +
+                 "start_data <= :current AND end_data >= :current ",
+           nativeQuery = true)
+    Page<Booking> findByOwnerIdCurrent(Long ownerId, LocalDateTime current, Pageable pageable);
 
-    @Query(value = "SELECT * FROM bookings " +
-            "WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) " +
-            "AND start_data > :current " +
-            "ORDER BY start_data DESC ",
-            nativeQuery = true)
-    Page<Booking> findByOwnerIdItemFuture(Long ownerId, LocalDateTime current, Pageable pageable);
+    @Query(value = "SELECT * FROM bookings WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) " +
+                   "AND start_data > :current ",
+      countQuery = "SELECT count(*) FROM bookings WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) " +
+                   "AND start_data > :current ",
+           nativeQuery = true)
+    Page<Booking> findByOwnerIdFuture(Long ownerId, LocalDateTime current, Pageable pageable);
 
-    @Query(value = "SELECT * FROM bookings " +
-            "WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) " +
-            "AND end_data < :current " +
-            "ORDER BY start_data DESC ",
-            nativeQuery = true)
-    Page<Booking> findByOwnerIdItemPast(Long ownerId, LocalDateTime current, Pageable pageable);
+    @Query(value = "SELECT * FROM bookings WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) " +
+                   "AND end_data < :current ",
+      countQuery = "SELECT count(*) FROM bookings WHERE item_id in (SELECT id FROM items WHERE user_id = :ownerId) " +
+                   "AND end_data < :current ",
+           nativeQuery = true)
+    Page<Booking> findByOwnerIdPast(Long ownerId, LocalDateTime current, Pageable pageable);
 
-    @Query(value = "SELECT * FROM bookings " +
-            "WHERE item_id in (SELECT i.id FROM items AS i WHERE i.user_id = :ownerId) AND status = :status " +
-            "ORDER BY start_data DESC ",
-            nativeQuery = true)
-    Page<Booking> findByOwnerIdItemAndStatus(Long ownerId, String status, Pageable pageable);
+    @Query(value = "SELECT * FROM bookings WHERE item_id in (SELECT i.id FROM items AS i WHERE i.user_id = :ownerId) " +
+                   "AND status = :status ",
+      countQuery = "SELECT count(*) FROM bookings WHERE item_id in (SELECT i.id FROM items AS i " +
+                   "WHERE i.user_id = :ownerId) AND status = :status ",
+           nativeQuery = true)
+    Page<Booking> findByOwnerIdAndStatus(Long ownerId, String status, Pageable pageable);
 }

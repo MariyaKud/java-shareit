@@ -27,8 +27,8 @@ public class ItemRequestMapper {
                 .build();
     }
 
-    public itemRequestDtoWithItems toDtoWithItems(ItemRequest itemRequest, List<ItemDto> items) {
-        return itemRequestDtoWithItems.builder()
+    public ItemRequestDtoWithItems toDtoWithItems(ItemRequest itemRequest, List<ItemDto> items) {
+        return ItemRequestDtoWithItems.builder()
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
                 .created(itemRequest.getCreated())

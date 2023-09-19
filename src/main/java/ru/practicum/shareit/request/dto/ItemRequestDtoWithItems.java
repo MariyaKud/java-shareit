@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class itemRequestDtoWithItems {
+public class ItemRequestDtoWithItems {
     private Long id;
     private String description;
     private LocalDateTime created;

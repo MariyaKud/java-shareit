@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,10 +17,10 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
                    "and (LOWER(name) LIKE LOWER(CONCAT('%', :text,'%')) " +
                    "or LOWER(description) LIKE LOWER(CONCAT('%', :text,'%')))",
             nativeQuery = true)
-    List<Item> findByAvailableTrueAndContainingText(String text);
+    Page<Item> findByAvailableTrueAndContainingText(String text, Pageable page);
 
     @EntityGraph("item-comment-graph")
-    List<Item> findByOwnerIdOrderById(Long ownerId);
+    Page<Item> findByOwnerIdOrderById(Long ownerId, Pageable page);
 
     @EntityGraph("item-comment-graph")
     @Override

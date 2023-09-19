@@ -2,6 +2,8 @@ package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import ru.practicum.shareit.exeption.EntityNotFoundException;
@@ -13,7 +15,7 @@ import ru.practicum.shareit.request.dto.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.dto.itemRequestDtoWithItems;
+import ru.practicum.shareit.request.dto.ItemRequestDtoWithItems;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -48,7 +50,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<itemRequestDtoWithItems> getMyItemRequests(long userId) {
+    public List<ItemRequestDtoWithItems> getMyItemRequests(long userId) {
         existsUserById(userId);
 
         Map<Long, ItemRequest> itemRequests = requestRepository.findByAuthorIdOrderByCreatedDesc(userId)
@@ -59,10 +61,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<itemRequestDtoWithItems> getAllItemRequests(long userId, int from, int size) {
-        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+    public List<ItemRequestDtoWithItems> getAllItemRequests(long userId, int from, int size) {
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size, Sort.by("created").descending());
 
-        Map<Long, ItemRequest> itemRequests = requestRepository.findByAuthorIdNotOrderByCreatedDesc(userId, page)
+        Map<Long, ItemRequest> itemRequests = requestRepository.findByAuthorIdNot(userId, pageable)
                                                                .stream()
                                                                .collect(Collectors.toMap(ItemRequest::getId,
                                                                          Function.identity()));
@@ -70,7 +72,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public itemRequestDtoWithItems getRequestById(Long userId, Long requestId) {
+    public ItemRequestDtoWithItems getRequestById(Long userId, Long requestId) {
         existsUserById(userId);
 
         Optional<ItemRequest> itemRequest = requestRepository.findById(requestId);
@@ -96,7 +98,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
     }
 
-    private List<itemRequestDtoWithItems> enrichRequestsByItems(Map<Long, ItemRequest> itemRequests) {
+    private List<ItemRequestDtoWithItems> enrichRequestsByItems(Map<Long, ItemRequest> itemRequests) {
         Map<Long, List<ItemDto>> items = itemRepository.findByRequestIds(itemRequests.keySet())
                                                        .stream()
                                                        .map(itemMapper::toDto)

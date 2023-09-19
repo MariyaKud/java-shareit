@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
@@ -99,28 +101,28 @@ public class BookingServiceImpl implements BookingService {
         final LocalDateTime current = LocalDateTime.now();
         Page<Booking> result;
         findUserById(bookerId);
-        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size,
+                                           Sort.by("start").descending());
 
         switch (stateBooking) {
             case ALL:
-                result = bookingRepository.findByBookerIdOrderByStartDesc(bookerId, page);
+                result = bookingRepository.findByBookerId(bookerId, pageable);
                 break;
             case CURRENT:
-                result = bookingRepository.findByBookerIdAndStateCurrentOrderByStartDesc(bookerId, current, page);
+                result = bookingRepository.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(bookerId, current,
+                                                                                                     current, pageable);
                 break;
             case FUTURE:
-                result = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(bookerId, current, page);
+                result = bookingRepository.findByBookerIdAndStartAfter(bookerId, current, pageable);
                 break;
             case PAST:
-                result = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(bookerId, current, page);
+                result = bookingRepository.findByBookerIdAndEndBefore(bookerId, current, pageable);
                 break;
             case WAITING:
-                result = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId,
-                                                                                    StatusBooking.WAITING, page);
+                result = bookingRepository.findByBookerIdAndStatus(bookerId, StatusBooking.WAITING, pageable);
                 break;
             case REJECTED:
-                result = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(bookerId,
-                                                                                    StatusBooking.REJECTED, page);
+                result = bookingRepository.findByBookerIdAndStatus(bookerId, StatusBooking.REJECTED, pageable);
                 break;
             default:
                 throw new EntityNotFoundException(0L, StateBooking.class);
@@ -134,28 +136,29 @@ public class BookingServiceImpl implements BookingService {
         final LocalDateTime current = LocalDateTime.now();
         Page<Booking> result;
         findUserById(ownerId);
-        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size,
+                            Sort.by("start_data").descending());
 
         switch (stateBooking) {
             case ALL:
-                result = bookingRepository.findByOwnerIdItem(ownerId, page);
+                result = bookingRepository.findByOwnerId(ownerId, pageable);
                 break;
             case CURRENT:
-                result = bookingRepository.findByOwnerIdItemCurrent(ownerId, current, page);
+                result = bookingRepository.findByOwnerIdCurrent(ownerId, current, pageable);
                 break;
             case FUTURE:
-                result = bookingRepository.findByOwnerIdItemFuture(ownerId, current, page);
+                result = bookingRepository.findByOwnerIdFuture(ownerId, current, pageable);
                 break;
             case PAST:
-                result = bookingRepository.findByOwnerIdItemPast(ownerId, current, page);
+                result = bookingRepository.findByOwnerIdPast(ownerId, current, pageable);
                 break;
             case WAITING:
-                result = bookingRepository.findByOwnerIdItemAndStatus(ownerId,
-                                                                       String.valueOf(StatusBooking.WAITING), page);
+                result = bookingRepository.findByOwnerIdAndStatus(ownerId,
+                         String.valueOf(StatusBooking.WAITING), pageable);
                 break;
             case REJECTED:
-                result = bookingRepository.findByOwnerIdItemAndStatus(ownerId,
-                                                                       String.valueOf(StatusBooking.REJECTED), page);
+                result = bookingRepository.findByOwnerIdAndStatus(ownerId,
+                         String.valueOf(StatusBooking.REJECTED), pageable);
                 break;
             default:
                 throw new EntityNotFoundException(0L, StateBooking.class);

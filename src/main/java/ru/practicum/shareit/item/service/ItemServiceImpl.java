@@ -1,6 +1,9 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.StatusBooking;
@@ -109,10 +112,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemWithBookings> getItemsByUserId(long userId) {
+    public List<ItemWithBookings> getItemsByUserId(long userId, int from, int size) {
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size);
+
         LocalDateTime current = LocalDateTime.now();
 
-        Map<Long, Item>  itemIds = itemRepository.findByOwnerIdOrderById(userId)
+        Map<Long, Item>  itemIds = itemRepository.findByOwnerIdOrderById(userId, pageable)
                                                  .stream()
                                                  .collect(Collectors.toMap(Item::getId, Function.identity()));
 
@@ -129,14 +134,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItemsForUserWithId(long userId, String text) {
+    public List<ItemDto> searchItemsForUserWithId(long userId, String text, int from, int size) {
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+
         existsUserById(userId);
 
         if (text.isBlank()) {
             return List.of();
         }
 
-        return (itemRepository.findByAvailableTrueAndContainingText(text)
+        return (itemRepository.findByAvailableTrueAndContainingText(text, page)
                               .stream()
                               .map(itemMapper::toDto)
                               .collect(Collectors.toList()));
