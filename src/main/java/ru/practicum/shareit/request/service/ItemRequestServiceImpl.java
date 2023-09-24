@@ -81,7 +81,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
 
         return requestMapper.toDtoWithItems(itemRequest.get(),
-                itemRepository.findByRequestId(requestId)
+                itemRepository.findByRequest_Id(requestId)
                               .stream()
                               .map(itemMapper::toDto)
                               .collect(Collectors.toList()));
@@ -99,7 +99,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private List<ItemRequestDtoWithItems> enrichRequestsByItems(Map<Long, ItemRequest> itemRequests) {
-        Map<Long, List<ItemDto>> items = itemRepository.findByRequestIds(itemRequests.keySet())
+        Map<Long, List<ItemDto>> items = itemRepository.findByRequest_Ids(itemRequests.keySet())
                                                        .stream()
                                                        .map(itemMapper::toDto)
                                                        .collect(Collectors.groupingBy(ItemDto::getRequestId));

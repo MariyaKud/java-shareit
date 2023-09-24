@@ -142,7 +142,7 @@ public class ItemServiceImpl implements ItemService {
             return List.of();
         }
 
-        return (itemRepository.findByAvailableTrueAndContainingText(text, page)
+        return (itemRepository.findByAvailableTrue_And_ContainingText(text, page)
                               .stream()
                               .map(itemMapper::toDto)
                               .collect(Collectors.toList()));

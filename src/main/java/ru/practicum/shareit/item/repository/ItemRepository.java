@@ -17,7 +17,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
                    "and (LOWER(name) LIKE LOWER(CONCAT('%', :text,'%')) " +
                    "or LOWER(description) LIKE LOWER(CONCAT('%', :text,'%')))",
             nativeQuery = true)
-    Page<Item> findByAvailableTrueAndContainingText(String text, Pageable page);
+    Page<Item> findByAvailableTrue_And_ContainingText(String text, Pageable page);
 
     @EntityGraph("item-comment-graph")
     Page<Item> findByOwner_Id(Long ownerId, Pageable page);
@@ -29,7 +29,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query(value = "SELECT * FROM items " +
                    "WHERE request_id in (:requestIds)",
             nativeQuery = true)
-    List<Item> findByRequestIds(Set<Long> requestIds);
+    List<Item> findByRequest_Ids(Set<Long> requestIds);
 
-    List<Item> findByRequestId(Long requestIds);
+    List<Item> findByRequest_Id(Long requestIds);
 }
