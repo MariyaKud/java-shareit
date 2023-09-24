@@ -19,7 +19,6 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.validation.ContextShareIt;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import javax.validation.constraints.Positive;

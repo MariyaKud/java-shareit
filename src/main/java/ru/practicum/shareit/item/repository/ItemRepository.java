@@ -20,7 +20,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Page<Item> findByAvailableTrueAndContainingText(String text, Pageable page);
 
     @EntityGraph("item-comment-graph")
-    Page<Item> findByOwnerIdOrderById(Long ownerId, Pageable page);
+    Page<Item> findByOwner_Id(Long ownerId, Pageable page);
 
     @EntityGraph("item-comment-graph")
     @Override

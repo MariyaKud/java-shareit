@@ -30,7 +30,7 @@ public class ItemMapper {
         return new ItemDtoShort(item.getId(), item.getName());
     }
 
-    public ItemWithBookings toDtoWithBooking(Item item, List<Booking> bookings, LocalDateTime current) {
+    public ItemDtoWithBookings toDtoWithBooking(Item item, List<Booking> bookings, LocalDateTime current) {
         Optional<Booking> last =  bookings.stream()
                                           .filter(f -> !f.getStart().isAfter(current))
                                           .reduce((first, second) -> second);
@@ -41,7 +41,7 @@ public class ItemMapper {
 
         Set<CommentDto> comments = item.getComments().stream().map(this::commentToDto).collect(Collectors.toSet());
 
-        return ItemWithBookings.builder()
+        return ItemDtoWithBookings.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())

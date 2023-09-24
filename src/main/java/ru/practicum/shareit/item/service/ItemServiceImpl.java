@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.StatusBooking;
@@ -13,7 +12,7 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentDtoShort;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemWithBookings;
+import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.exeption.ItemBelongsAnotherOwner;
 import ru.practicum.shareit.item.exeption.ItemUnavailable;
 import ru.practicum.shareit.item.model.Item;
@@ -94,7 +93,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemWithBookings getItemByIdForUserId(long userId, long itemId) {
+    public ItemDtoWithBookings getItemByIdForUserId(long userId, long itemId) {
         List<Booking> bookings;
         LocalDateTime current = LocalDateTime.now();
 
@@ -112,12 +111,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemWithBookings> getItemsByUserId(long userId, int from, int size) {
+    public List<ItemDtoWithBookings> getItemsByUserId(long userId, int from, int size) {
         Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size);
 
         LocalDateTime current = LocalDateTime.now();
 
-        Map<Long, Item>  itemIds = itemRepository.findByOwnerIdOrderById(userId, pageable)
+        Map<Long, Item>  itemIds = itemRepository.findByOwner_Id(userId, pageable)
                                                  .stream()
                                                  .collect(Collectors.toMap(Item::getId, Function.identity()));
 
