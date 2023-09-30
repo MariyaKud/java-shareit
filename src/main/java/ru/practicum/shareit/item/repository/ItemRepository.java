@@ -31,5 +31,5 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             nativeQuery = true)
     List<Item> findByRequest_Ids(Set<Long> requestIds);
 
-    List<Item> findByRequest_Id(Long requestIds);
+    List<Item> findByRequest_Id(Long requestId);
 }

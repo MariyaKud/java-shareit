@@ -48,7 +48,7 @@ class ItemRequestRepositoryTest {
 
     @Test
     @DisplayName("should find requests by author id")
-    void should_Find_ByAuthorId_OrderByCreatedDesc() {
+    void should_find_by_author_id() {
         List<ItemRequest> requests = itemRequestRepository.findByAuthorIdOrderByCreatedDesc(user1.getId());
 
         assertEquals(2, requests.size());
@@ -58,8 +58,8 @@ class ItemRequestRepositoryTest {
     }
 
     @Test
-    @DisplayName("should find requests by author not id")
-    void should_FindByAuthor_IdNot() {
+    @DisplayName("should find requests by author not equal id")
+    void should_find_author_not_equal_id() {
         final Page<ItemRequest> requests = itemRequestRepository.findByAuthorIdNot(user1.getId(), Pageable.unpaged());
 
         assertEquals(0, requests.getTotalElements());

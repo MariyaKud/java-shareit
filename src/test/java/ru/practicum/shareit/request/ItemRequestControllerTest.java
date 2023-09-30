@@ -64,7 +64,7 @@ class ItemRequestControllerTest {
 
     @Test
     @DisplayName("should create item request")
-    void should_Create_ItemRequest() throws Exception {
+    void should_create_item_request() throws Exception {
         when(itemRequestService.createItemRequest(anyLong(), any(), any()))
                 .thenReturn(requestDto);
 
@@ -83,8 +83,8 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    @DisplayName("should get item requests for user id")
-    void should_Get_ItemRequests_For_UserId() throws Exception {
+    @DisplayName("should get item requests for author id")
+    void should_get_item_requests_bu_author_id() throws Exception {
         when(itemRequestService.getMyItemRequests(anyLong()))
                 .thenReturn(List.of(requestDtoWithItems));
 
@@ -103,7 +103,7 @@ class ItemRequestControllerTest {
 
     @Test
     @DisplayName("should get all requests")
-    void should_Get_All_ItemRequests() throws Exception {
+    void should_get_all_item_requests() throws Exception {
         when(itemRequestService.getAllItemRequests(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(requestDtoWithItems));
 
@@ -121,7 +121,7 @@ class ItemRequestControllerTest {
 
     @Test
     @DisplayName("should get item request by id")
-    void should_Get_ItemRequest_ById_ForUserId() throws Exception {
+    void should_get_item_request_by_id() throws Exception {
         when(itemRequestService.getRequestById(anyLong(), anyLong()))
                 .thenReturn(requestDtoWithItems);
 

@@ -67,6 +67,7 @@ class   ItemControllerTest {
                                                                 .nextBooking(null)
                                                                 .comments(Collections.emptySet())
                                                                 .build();
+
     @Test
     @DisplayName("should create item")
     void should_Create_Item() throws Exception {
@@ -122,8 +123,7 @@ class   ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemDtoWithBookings)));
 
-        verify(itemService, times(1)).
-                getItemByIdForUserId(anyLong(), anyLong());
+        verify(itemService, times(1)).getItemByIdForUserId(anyLong(), anyLong());
     }
 
     @Test
@@ -144,8 +144,8 @@ class   ItemControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(content().json(mapper.writeValueAsString(List.of(itemDtoWithBookings))));
 
-        verify(itemService, times(1)).
-                getItemsByUserId(anyLong(), anyInt(), anyInt());
+        verify(itemService, times(1))
+                .getItemsByUserId(anyLong(), anyInt(), anyInt());
     }
 
     @Test
@@ -167,8 +167,8 @@ class   ItemControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(content().json(mapper.writeValueAsString(List.of(itemDto))));
 
-        verify(itemService, times(1)).
-                searchItemsForUserWithId(anyLong(), anyString(), anyInt(), anyInt());
+        verify(itemService, times(1))
+                .searchItemsForUserWithId(anyLong(), anyString(), anyInt(), anyInt());
     }
 
     @Test

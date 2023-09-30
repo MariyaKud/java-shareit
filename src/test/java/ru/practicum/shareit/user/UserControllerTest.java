@@ -33,7 +33,7 @@ import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.validation.ContextShareIt;
 
 
-@DisplayName("User controller")
+@DisplayName("Test User controller")
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc
 class UserControllerTest {
@@ -50,7 +50,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("should create user")
-    void should_Create_User() throws Exception {
+    void should_create_user() throws Exception {
         when(userService.createUser(any()))
                 .thenReturn(userDto);
 
@@ -69,7 +69,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("should update user")
-    void should_Update_User() throws Exception {
+    void should_update_user() throws Exception {
         when(userService.updateUser(anyLong(), any()))
                 .thenReturn(userDto);
 
@@ -88,7 +88,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("should delete user")
-    void should_Delete_User() throws Exception {
+    void should_delete_user() throws Exception {
         when(userService.deleteUserById(anyLong()))
                 .thenReturn(true);
 
@@ -123,7 +123,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("should find user by id")
-    void should_Get_UserById() throws Exception {
+    void should_get_user_by_id() throws Exception {
         when(userService.getUserById(anyLong()))
                 .thenReturn(userDto);
 

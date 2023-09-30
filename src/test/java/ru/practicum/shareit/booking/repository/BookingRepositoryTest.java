@@ -39,7 +39,7 @@ class BookingRepositoryTest {
     Booking booking1;
     Booking booking2;
 
-    private final static LocalDateTime current = LocalDateTime.now();
+    private final LocalDateTime current = LocalDateTime.now();
 
     @BeforeEach
     void beforeEach() {
