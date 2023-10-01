@@ -50,7 +50,7 @@ class BookingDtoOutJsonTest {
 
     @Test
     @DisplayName("should serialize")
-    void testSerialize() throws Exception {
+    void test_serialize() throws Exception {
 
         JsonContent<BookingDtoOut> result = jacksonTester.write(bookingDto);
 
@@ -73,7 +73,7 @@ class BookingDtoOutJsonTest {
 
     @Test
     @DisplayName("should deserialize")
-    void testDeserialize() throws IOException {
+    void test_deserialize() throws IOException {
         var dto = jacksonTester.parseObject(bookingDtoJson);
 
         AssertionsForClassTypes.assertThat(dto).extracting("id").isEqualTo(bookingDto.getId());

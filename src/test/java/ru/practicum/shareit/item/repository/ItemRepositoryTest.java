@@ -84,7 +84,7 @@ class ItemRepositoryTest {
 
     @DisplayName("should find item by owner")
     @Test
-    void should_find_items_With_Text() {
+    void should_find_items_with_text() {
         final Page<Item> byOwner = itemRepository.findByAvailableTrue_And_ContainingText("ite", Pageable.unpaged());
 
         assertEquals(2, byOwner.getTotalElements());
@@ -95,7 +95,7 @@ class ItemRepositoryTest {
 
     @DisplayName("should find item by owner")
     @Test
-    void should_Find_Item_By_Owner() {
+    void should_find_item_by_owner() {
         final Page<Item> byOwner = itemRepository.findByOwner_Id(user1.getId(), Pageable.unpaged());
 
         assertEquals(1, byOwner.getTotalElements());
@@ -104,7 +104,7 @@ class ItemRepositoryTest {
 
     @DisplayName("should find items by request ids")
     @Test
-    void should_Find_Items_By_RequestIds() {
+    void should_find_items_by_requestIds() {
         final List<Item> byRequestId = itemRepository.findByRequest_Ids(Set.of(request1.getId()));
 
         assertEquals(1, byRequestId.size());
@@ -113,7 +113,7 @@ class ItemRepositoryTest {
 
     @DisplayName("should find items by request id")
     @Test
-    void should_Find_Items_By_RequestId() {
+    void should_find_items_by_requestId() {
         final List<Item> byRequestId = itemRepository.findByRequest_Id(request1.getId());
 
         assertEquals(1, byRequestId.size());
@@ -122,7 +122,7 @@ class ItemRepositoryTest {
 
     @DisplayName("should get item by id")
     @Test
-    void should_Get_Items_By_Id() {
+    void should_get_items_by_id() {
         final Optional<Item> item = itemRepository.findById(item1.getId());
 
         assertEquals(item1, item.get());

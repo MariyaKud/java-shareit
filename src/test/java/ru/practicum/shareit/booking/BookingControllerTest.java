@@ -68,7 +68,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("should create booking")
-    void should_Create_Booking() throws Exception {
+    void should_create_booking() throws Exception {
         when(bookingService.createBooking(anyLong(), any(), any()))
                 .thenReturn(bookingDto);
 
@@ -117,7 +117,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("should approve booking")
-    void should_Approved_Booking() throws Exception {
+    void should_approved_booking() throws Exception {
         when(bookingService.approvedBooking(anyLong(), anyLong(), anyBoolean()))
                 .thenReturn(bookingDto);
 
@@ -137,7 +137,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("should get booking by id")
-    void should_Get_Booking_ById() throws Exception {
+    void should_get_booking_by_id() throws Exception {
         when(bookingService.getBookingById(anyLong(), anyLong()))
                 .thenReturn(bookingDto);
 
@@ -153,7 +153,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("should get booking by booker id")
-    void should_Get_Bookings_By_Booker_Id() throws Exception {
+    void should_get_bookings_by_booker_id() throws Exception {
         when(bookingService.getBookingsByBookerId(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 
@@ -171,7 +171,7 @@ class BookingControllerTest {
 
     @Test
     @DisplayName("should get booking for owner item id")
-    void should_Get_Bookings_For_Item_Owner_Id() throws Exception {
+    void should_get_bookings_for_item_owner_id() throws Exception {
         when(bookingService.getBookingsByOwnerId(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 

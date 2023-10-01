@@ -75,21 +75,21 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void existsByBookerIdAndItemIdAndEndBeforeAndStatus() {
+    void exists_by_booker_id_and_item_id_and_end_before_and_status() {
         boolean existsBooking = bookingRepository.existsByBookerIdAndItemIdAndEndBeforeAndStatus(
                                         user2.getId(), item1.getId(), current.plusDays(3), StatusBooking.APPROVED);
         assertTrue(existsBooking);
     }
 
     @Test
-    void existsByItemIdInPeriodFromStartToEnd() {
+    void exists_by_item_id_in_period_from_start_to_end() {
         boolean existsBooking = bookingRepository.existsByItemIdInPeriodFromStartToEnd(
                                                   item1.getId(), current, current.plusDays(3));
         assertTrue(existsBooking);
     }
 
     @Test
-    void findByItemsBooking() {
+    void find_by_items_booking() {
         List<Booking> bookings = bookingRepository.findByItemsBooking(Set.of(item1.getId()),
                                                                       StatusBooking.APPROVED.name());
 
@@ -97,35 +97,35 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByBookerId() {
+    void find_by_booker_id() {
         Page<Booking> bookings = bookingRepository.findByBookerId(user3.getId(), Pageable.unpaged());
 
         assertEquals(1, bookings.getTotalElements());
     }
 
     @Test
-    void findByBookerIdAndEndBefore() {
+    void find_by_booker_id_and_end_before() {
         Page<Booking> bookings = bookingRepository.findByBookerIdAndEndBefore(user2.getId(), current.plusDays(3),
                                                                                Pageable.unpaged());
         assertEquals(1, bookings.getTotalElements());
     }
 
     @Test
-    void findByBookerIdAndStartAfter() {
+    void find_by_booker_id_and_start_after() {
         Page<Booking> bookings = bookingRepository.findByBookerIdAndStartAfter(user2.getId(), current,
                                                                                 Pageable.unpaged());
         assertEquals(1, bookings.getTotalElements());
     }
 
     @Test
-    void findByBookerIdAndStatus() {
+    void find_by_booker_id_and_status() {
         Page<Booking> bookings = bookingRepository.findByBookerIdAndStatus(user2.getId(), StatusBooking.APPROVED,
                                                                             Pageable.unpaged());
         assertEquals(1, bookings.getTotalElements());
     }
 
     @Test
-    void findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual() {
+    void find_by_booker_id_and_start_less_than_equal_and_end_greater_than_equal() {
         Page<Booking> bookings = bookingRepository.findByBookerIdAndStartLessThanEqualAndEndGreaterThanEqual(
            user2.getId(), current.plusDays(1).plusMinutes(60), current.plusDays(1).plusMinutes(60), Pageable.unpaged());
 
@@ -133,7 +133,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findBookingByIdForOwner() {
+    void find_booking_by_id_for_owner() {
         Optional<Booking> bookings = bookingRepository.findBookingByIdForOwner(booking1.getId(), user1.getId());
 
         assertTrue(bookings.isPresent());
@@ -141,14 +141,14 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerId() {
+    void find_by_owner_id() {
         Page<Booking> bookings = bookingRepository.findByOwnerId(user1.getId(), Pageable.unpaged());
 
         assertEquals(2, bookings.getTotalElements());
     }
 
     @Test
-    void findByOwnerIdCurrent() {
+    void find_by_owner_id_current() {
         Page<Booking> bookings = bookingRepository.findByOwnerIdCurrent(user1.getId(),
                                   current.plusDays(1).plusMinutes(10), Pageable.unpaged());
 
@@ -157,7 +157,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerIdFuture() {
+    void find_by_owner_id_future() {
         Page<Booking> bookings = bookingRepository.findByOwnerIdFuture(user1.getId(),
                                   current.plusDays(2), Pageable.unpaged());
 
@@ -165,7 +165,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerIdPast() {
+    void ffind_by_owner_id_past() {
         Page<Booking> bookings = bookingRepository.findByOwnerIdPast(user1.getId(),
                                   current.plusDays(5), Pageable.unpaged());
 
@@ -173,7 +173,7 @@ class BookingRepositoryTest {
     }
 
     @Test
-    void findByOwnerIdAndStatus() {
+    void find_by_owner_id_and_sStatus() {
         Page<Booking> bookings = bookingRepository.findByOwnerIdAndStatus(user1.getId(),
                                   StatusBooking.WAITING.toString(), Pageable.unpaged());
 
