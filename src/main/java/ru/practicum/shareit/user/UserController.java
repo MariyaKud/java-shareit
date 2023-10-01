@@ -22,6 +22,7 @@ import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/users")

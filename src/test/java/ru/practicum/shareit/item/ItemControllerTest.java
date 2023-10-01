@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -18,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +39,13 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validation.ContextShareIt;
+import ru.practicum.shareit.validation.Create;
+import ru.practicum.shareit.validation.Update;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 @DisplayName("Item controller")
 @WebMvcTest(ItemController.class)
@@ -50,6 +60,16 @@ class   ItemControllerTest {
 
     @Autowired
     private ObjectMapper mapper;
+
+    private static final Validator validator;
+
+    private Set<ConstraintViolation<ItemDto>> validates;
+
+    static {
+        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            validator = validatorFactory.usingContext().getValidator();
+        }
+    }
 
     private static final long userId = 1L;
 
@@ -191,5 +211,90 @@ class   ItemControllerTest {
                 .andExpect(content().json(mapper.writeValueAsString(commentDto)));
 
         verify(itemService, times(1)).createComment(anyLong(), anyLong(), any(), any());
+    }
+
+    @DisplayName("should not validate id for item")
+    @Test
+    public void should_not_validate_id() {
+        final ItemDto valueToCheck = new ItemDto();
+        valueToCheck.setId(-1L);
+        valueToCheck.setName("name");
+        valueToCheck.setDescription("description");
+        valueToCheck.setAvailable(true);
+        valueToCheck.setRequestId(1L);
+
+        validates = validator.validate(valueToCheck, Update.class);
+
+        assertEquals("id", validates.iterator().next().getPropertyPath().toString(),
+                "должно быть больше 0");
+    }
+
+    @Test
+    @DisplayName("should not get all requests")
+    void should_not_search_items() throws Exception {
+        when(itemService.searchItemsForUserWithId(anyLong(), anyString(), anyInt(), anyInt()))
+                .thenReturn(List.of(itemDto));
+
+        mockMvc.perform(get("/items/search")
+                        .header(ContextShareIt.HEADER_USER_ID, userId)
+                        .param("text", "name")
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(0))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Mistake for empty name")
+    @Test
+    void should_not_validate_empty_name() {
+        final ItemDto valueToCheck = new ItemDto();
+        valueToCheck.setId(itemDto.getId());
+        valueToCheck.setName("");
+        valueToCheck.setDescription("description");
+        valueToCheck.setAvailable(true);
+        valueToCheck.setRequestId(1L);
+
+        validates = validator.validate(valueToCheck, Update.class);
+
+        assertTrue(validates.size() > 0);
+        assertEquals("name", validates.iterator().next().getPropertyPath().toString(),
+                "размер должен находиться в диапазоне от 1 до 100");
+    }
+
+    @DisplayName("Mistake for empty description")
+    @Test
+    void should_not_validate_empty_description() {
+        final ItemDto valueToCheck = new ItemDto();
+        valueToCheck.setId(itemDto.getId());
+        valueToCheck.setName("name");
+        valueToCheck.setDescription("");
+        valueToCheck.setAvailable(true);
+        valueToCheck.setRequestId(1L);
+
+        validates = validator.validate(valueToCheck, Update.class);
+
+        assertTrue(validates.size() > 0);
+        assertEquals("description", validates.iterator().next().getPropertyPath().toString(),
+                "размер должен находиться в диапазоне от 1 до 1000");
+    }
+
+    @DisplayName("Mistake for available null")
+    @Test
+    void should_not_validate_empty_available_null() {
+        final ItemDto valueToCheck = new ItemDto();
+        valueToCheck.setId(itemDto.getId());
+        valueToCheck.setName("name");
+        valueToCheck.setDescription("Description");
+        valueToCheck.setAvailable(null);
+        valueToCheck.setRequestId(1L);
+
+        validates = validator.validate(valueToCheck, Create.class);
+
+        assertTrue(validates.size() > 0);
+        assertEquals("available", validates.iterator().next().getPropertyPath().toString(),
+                "не должно равняться null");
     }
 }

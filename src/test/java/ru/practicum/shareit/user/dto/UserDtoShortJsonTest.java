@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.dto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,9 @@ class UserDtoShortJsonTest {
     @Autowired
     private JacksonTester<UserDto> jacksonTester;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private final UserDto userDto = new UserDto(1L, "John", "john.doe@mail.com");
 
     @Test
@@ -34,11 +38,7 @@ class UserDtoShortJsonTest {
     @Test
     @DisplayName("should deserialize")
     void testDeserialize() throws IOException {
-         final String userDtoJson = "{\n" +
-                                    "    \"id\": 1,\n" +
-                                    "    \"name\": \"John\",\n" +
-                                    "    \"email\": \"john.doe@mail.com\"\n" +
-                                    "}";
+        final String userDtoJson = objectMapper.writeValueAsString(userDto);
 
         var dto = jacksonTester.parseObject(userDtoJson);
 

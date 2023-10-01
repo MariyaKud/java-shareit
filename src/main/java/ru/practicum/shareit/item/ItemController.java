@@ -27,6 +27,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
@@ -54,8 +55,10 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoWithBookings> getItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                                      @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                                      @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                                      @PositiveOrZero @RequestParam(name = "from",
+                                                              defaultValue = "0") Integer from,
+                                                      @Positive @RequestParam(name = "size",
+                                                              defaultValue = "10") Integer size) {
         return itemService.getItemsByUserId(userId, from, size);
     }
 

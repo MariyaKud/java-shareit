@@ -18,11 +18,17 @@ import ru.practicum.shareit.item.dto.ItemDtoShort;
 import ru.practicum.shareit.user.dto.UserDtoShort;
 import ru.practicum.shareit.validation.ContextShareIt;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -50,6 +56,16 @@ class BookingControllerTest {
 
     @Autowired
     private ObjectMapper mapper;
+
+    private static final Validator validator;
+
+    private Set<ConstraintViolation<BookingDto>> validates;
+
+    static {
+        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            validator = validatorFactory.usingContext().getValidator();
+        }
+    }
 
     private final LocalDateTime current = LocalDateTime.now().plusMinutes(5L);
 
@@ -185,5 +201,83 @@ class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(content().json(mapper.writeValueAsString(List.of(bookingDto))));
+    }
+
+    @DisplayName("should not validate item id negative")
+    @Test
+    public void should_not_validate_id() {
+        final BookingDto valueToCheck = BookingDto.builder()
+                .id(bookingDto.getId())
+                .itemId(-1L)
+                .start(bookingDto.getStart())
+                .end(bookingDto.getEnd())
+                .build();
+
+        validates = validator.validate(valueToCheck);
+
+        assertEquals("itemId", validates.iterator().next().getPropertyPath().toString(),
+                "должно быть больше 0");
+    }
+
+    @DisplayName("should not validate item id null")
+    @Test
+    public void should_not_validate_id_null() {
+        final BookingDto valueToCheck = BookingDto.builder()
+                .id(bookingDto.getId())
+                .itemId(null)
+                .start(bookingDto.getStart())
+                .end(bookingDto.getEnd())
+                .build();
+
+        validates = validator.validate(valueToCheck);
+
+        assertEquals("itemId", validates.iterator().next().getPropertyPath().toString(),
+                "не должно равняться null");
+    }
+
+    @DisplayName("should not validate start in past")
+    @Test
+    public void should_not_validate_start_in_past() {
+        final BookingDto valueToCheck = BookingDto.builder()
+                .id(bookingDto.getId())
+                .itemId(itemDto.getId())
+                .start(LocalDateTime.now().minusDays(10))
+                .end(bookingDto.getEnd())
+                .build();
+
+        validates = validator.validate(valueToCheck);
+
+        assertEquals("start", validates.iterator().next().getPropertyPath().toString(),
+                "должно содержать сегодняшнее число или дату, которая еще не наступила");
+    }
+
+    @DisplayName("should not get bookings by user id")
+    @Test
+    void should_not_get_bookings_by_user_id() throws Exception {
+        when(bookingService.getBookingsByBookerId(anyLong(), any(), anyInt(), anyInt()))
+                .thenReturn(List.of(bookingDto));
+
+        mockMvc.perform(get("/bookings")
+                        .header(ContextShareIt.HEADER_USER_ID, userDtoShort.getId())
+                        .param("state", "ALL")
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(0))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("should not get bookings by owner id")
+    @Test
+    void should_not_get_bookings_by_owner_id() throws Exception {
+        when(bookingService.getBookingsByOwnerId(anyLong(), any(), anyInt(), anyInt()))
+                .thenReturn(List.of(bookingDto));
+
+        mockMvc.perform(get("/bookings/owner")
+                        .header(ContextShareIt.HEADER_USER_ID, userDtoShort.getId())
+                        .param("state", "ALL")
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(0))
+                )
+                .andExpect(status().isBadRequest());
     }
 }

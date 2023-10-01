@@ -1,5 +1,7 @@
 package ru.practicum.shareit.user;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
@@ -12,8 +14,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.nio.charset.StandardCharsets;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +35,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.validation.ContextShareIt;
+import ru.practicum.shareit.validation.Create;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 @DisplayName("Test User controller")
 @WebMvcTest(UserController.class)
@@ -45,6 +54,16 @@ class UserControllerTest {
 
     @Autowired
     private ObjectMapper mapper;
+
+    private static final Validator validator;
+
+    private Set<ConstraintViolation<UserDto>> validates;
+
+    static {
+        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            validator = validatorFactory.usingContext().getValidator();
+        }
+    }
 
     private final UserDto userDto = new UserDto(1L,"John","john.doe@mail.com");
 
@@ -134,6 +153,63 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.email", Matchers.is(userDto.getEmail()), String.class));
 
         verify(userService, times(1)).getUserById(anyLong());
+    }
+
+    @DisplayName("should not validate id")
+    @Test
+    public void should_not_validate_id() {
+        final UserDto valueToCheck = new UserDto(-1L, userDto.getName(), userDto.getEmail());
+        validates = validator.validate(valueToCheck, Create.class);
+
+        assertEquals("id", validates.iterator().next().getPropertyPath().toString(),
+                 "должно быть больше 0");
+    }
+
+    @DisplayName("should not validate for empty User")
+    @Test
+    void should_not_validate_empty_user_to_create() {
+        final UserDto valueToCheck = new UserDto();
+
+        validates = validator.validate(valueToCheck, Create.class);
+        assertTrue(validates.size() > 0);
+    }
+
+    @DisplayName("Mistake for empty Email")
+    @Test
+    void should_not_validate_empty_email() {
+        final UserDto valueToCheck = new UserDto(userDto.getId(), userDto.getName(), "");
+
+        validates = validator.validate(valueToCheck, Create.class);
+
+        assertTrue(validates.size() > 0);
+        assertEquals("email", validates.iterator().next().getPropertyPath().toString(),
+                "размер должен находиться в диапазоне от 1 до 512");
+    }
+
+    @DisplayName("Mistake for Email without @")
+    @Test
+    void should_not_validate_email_without_dog() {
+        final UserDto valueToCheck = new UserDto(userDto.getId(), userDto.getName(), "myemail");
+
+        validates = validator.validate(valueToCheck, Create.class);
+
+        assertTrue(validates.size() > 0);
+        assertEquals("email",
+                validates.iterator().next().getPropertyPath().toString(),
+                "должно иметь формат адреса электронной почты");
+    }
+
+    @DisplayName("Mistake for Email with @")
+    @Test
+    public void should_not_validate_email_with_dog() {
+        final UserDto valueToCheck = new UserDto(userDto.getId(), userDto.getName(), "это-неправильный?Email@");
+
+        validates = validator.validate(valueToCheck, Create.class);
+
+        assertTrue(validates.size() > 0);
+        assertEquals("email",
+                validates.iterator().next().getPropertyPath().toString(),
+                "должно иметь формат адреса электронной почты");
     }
 
     public static final long userId = 1L;

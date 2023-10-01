@@ -1,6 +1,8 @@
 package ru.practicum.shareit.request;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -17,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -30,10 +33,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
 import ru.practicum.shareit.request.dto.ItemRequestDtoWithItems;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.validation.ContextShareIt;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 @DisplayName("ItemRequest controller")
 @WebMvcTest(ItemRequestController.class)
@@ -61,6 +70,16 @@ class ItemRequestControllerTest {
                                                                   .created(requestDto.getCreated())
                                                                   .items(Collections.emptyList())
                                                                   .build();
+
+    private static final Validator validator;
+
+    private Set<ConstraintViolation<ItemRequestDto>> validates;
+
+    static {
+        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            validator = validatorFactory.usingContext().getValidator();
+        }
+    }
 
     @Test
     @DisplayName("should create item request")
@@ -136,5 +155,34 @@ class ItemRequestControllerTest {
                 .andExpect(content().json(mapper.writeValueAsString(requestDtoWithItems)));
 
         verify(itemRequestService, times(1)).getRequestById(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("should not create with empty description")
+    void should_not_create_with_empty_description() {
+        final ItemRequestDto valueToCheck = new ItemRequestDto("");
+
+        validates = validator.validate(valueToCheck);
+
+        assertTrue(validates.size() > 0);
+        assertEquals("description",
+                validates.iterator().next().getPropertyPath().toString(),
+                "не должно быть пустым");
+    }
+
+    @Test
+    @DisplayName("should not get all requests")
+    void should_nt_get_all_item_requests() throws Exception {
+        when(itemRequestService.getAllItemRequests(anyLong(), anyInt(), anyInt()))
+                .thenReturn(List.of(requestDtoWithItems));
+
+        mockMvc.perform(get("/requests/all")
+                        .header(ContextShareIt.HEADER_USER_ID, userId)
+                        .param("from", String.valueOf(0))
+                        .param("size", String.valueOf(0))
+                )
+                .andExpect(status().isBadRequest());
+
+        verify(itemRequestService, times(0)).getAllItemRequests(anyLong(), anyInt(), anyInt());
     }
 }
