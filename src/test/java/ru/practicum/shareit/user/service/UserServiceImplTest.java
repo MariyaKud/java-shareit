@@ -118,9 +118,12 @@ class UserServiceImplTest {
 
         UserDto user = service.getUserById(userDto.getId());
 
-        assertThat(user.getId(), equalTo(userDto.getId()));
-        assertThat(user.getName(), equalTo(userDto.getName()));
-        assertThat(user.getEmail(), equalTo(userDto.getEmail()));
+        TypedQuery<User> query = em.createQuery("Select i from User i where i.id = :id", User.class);
+        User userInBase = query.setParameter("id", userDto.getId()).getSingleResult();
+
+        assertThat(user.getId(), equalTo(userInBase.getId()));
+        assertThat(user.getName(), equalTo(userInBase.getName()));
+        assertThat(user.getEmail(), equalTo(userInBase.getEmail()));
 
         User userFromDto = mapper.fromDto(user);
         assertThat(user.getId(), equalTo(userFromDto.getId()));
