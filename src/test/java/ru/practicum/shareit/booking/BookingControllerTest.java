@@ -94,6 +94,28 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("should get mistake validation")
+    void should_not_valid_create_booking() throws Exception {
+        BookingDto dto = BookingDto.builder()
+                .id(bookingDto.getId())
+                .itemId(bookingDto.getItem().getId())
+                .start(null)
+                .end(null)
+                .build();
+
+        mockMvc.perform(post("/bookings")
+                        .header(ContextShareIt.HEADER_USER_ID, userDtoShort.getId())
+                        .content(mapper.writeValueAsString(dto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
+
+        verify(bookingService, times(0)).createBooking(anyLong(), any(), any());
+    }
+
+    @Test
     @DisplayName("should approve booking")
     void should_Approved_Booking() throws Exception {
         when(bookingService.approvedBooking(anyLong(), anyLong(), anyBoolean()))

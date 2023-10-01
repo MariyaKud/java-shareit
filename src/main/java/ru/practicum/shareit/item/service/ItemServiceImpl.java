@@ -26,6 +26,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -165,10 +166,11 @@ public class ItemServiceImpl implements ItemService {
             Comment comment = commentRepository.save(itemMapper.commentFromDto(commentDto, item, author, current));
 
             if (item.getComments() == null) {
-                item.setComments(Set.of(comment));
-            } else {
-                item.getComments().add(comment);
+                Set<Comment> comments = new HashSet<>();
+                item.setComments(comments);
             }
+
+            item.getComments().add(comment);
 
             itemRepository.save(item);
 

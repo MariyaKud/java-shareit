@@ -13,6 +13,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.test.annotation.Rollback;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoShort;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +40,7 @@ class UserServiceImplTest {
 
     private final EntityManager em;
     private final UserServiceImpl service;
+    private final UserMapper mapper;
 
     UserDto userDto;
 
@@ -64,6 +67,13 @@ class UserServiceImplTest {
         assertThat(user.getId(), equalTo(userDto.getId()));
         assertThat(user.getName(), equalTo(userDto.getName()));
         assertThat(user.getEmail(), equalTo(userDto.getEmail()));
+
+        UserDto dto = mapper.toDto(user);
+        assertThat(dto, equalTo(userDto));
+
+        UserDtoShort dtoShort = mapper.toShortDto(user);
+        assertThat(user.getId(), equalTo(dtoShort.getId()));
+        assertThat(user.getEmail(), equalTo(dtoShort.getEmail()));
     }
 
     @Test
@@ -111,6 +121,11 @@ class UserServiceImplTest {
         assertThat(user.getId(), equalTo(userDto.getId()));
         assertThat(user.getName(), equalTo(userDto.getName()));
         assertThat(user.getEmail(), equalTo(userDto.getEmail()));
+
+        User userFromDto = mapper.fromDto(user);
+        assertThat(user.getId(), equalTo(userFromDto.getId()));
+        assertThat(user.getName(), equalTo(userFromDto.getName()));
+        assertThat(user.getEmail(), equalTo(userFromDto.getEmail()));
     }
 
     @Test

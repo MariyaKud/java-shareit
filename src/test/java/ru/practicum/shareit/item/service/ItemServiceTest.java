@@ -402,7 +402,7 @@ class ItemServiceTest {
 
         when(itemMapper.toDtoWithBooking(any(), anyList(), any())).thenReturn(itemDtoWithBooking);
 
-        ItemDtoWithBookings itemDtoWithBooking = itemService.getItemByIdForUserId(guest.getId(), item.getId());
+        itemService.getItemByIdForUserId(guest.getId(), item.getId());
 
         verify(userRepository, times(1))
                 .existsById(anyLong());
@@ -424,7 +424,7 @@ class ItemServiceTest {
 
         when(itemMapper.toDtoWithBooking(any(), anyList(), any())).thenReturn(itemDtoWithBooking);
 
-        ItemDtoWithBookings itemDtoWithBooking = itemService.getItemByIdForUserId(user.getId(), item.getId());
+        itemService.getItemByIdForUserId(user.getId(), item.getId());
 
         verify(userRepository, times(1))
                 .existsById(anyLong());
@@ -444,7 +444,7 @@ class ItemServiceTest {
 
         when(itemRepository.findByAvailableTrue_And_ContainingText(anyString(), any())).thenReturn(itemPage);
 
-        List<ItemDto> items = itemService.searchItemsForUserWithId(user.getId(), "text", 0, 10);
+        itemService.searchItemsForUserWithId(user.getId(), "text", 0, 10);
 
         verify(userRepository, times(1))
                 .existsById(anyLong());
