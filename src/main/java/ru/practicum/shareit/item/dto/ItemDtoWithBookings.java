@@ -11,7 +11,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class ItemWithBookings {
+public class ItemDtoWithBookings {
     private Long id;
     private String name;
     private String description;

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exeption.EntityNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -19,8 +20,8 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll()
+    public List<UserDto> getAllUsers(PageRequest pageRequest) {
+        return userRepository.findAll(pageRequest)
                              .stream()
                              .map(userMapper::toDto)
                              .collect(Collectors.toList());
@@ -56,9 +57,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUserById(long userId) {
+    public Boolean deleteUserById(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId, User.class));
         userRepository.delete(user);
+        return true;
     }
 
     private User findUserById(long userId) {

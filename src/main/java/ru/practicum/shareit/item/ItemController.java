@@ -15,16 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentDtoShort;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemWithBookings;
+import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validation.Create;
 import ru.practicum.shareit.validation.Update;
 import ru.practicum.shareit.validation.ContextShareIt;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
@@ -45,20 +48,26 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemWithBookings getItemByIdForUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                                  @PathVariable Long itemId) {
+    public ItemDtoWithBookings getItemByIdForUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
+                                                    @PathVariable Long itemId) {
         return itemService.getItemByIdForUserId(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemWithBookings> getItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId) {
-        return itemService.getItemsByUserId(userId);
+    public List<ItemDtoWithBookings> getItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
+                                                      @PositiveOrZero @RequestParam(name = "from",
+                                                              defaultValue = "0") Integer from,
+                                                      @Positive @RequestParam(name = "size",
+                                                              defaultValue = "10") Integer size) {
+        return itemService.getItemsByUserId(userId, from, size);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItemsByUserId(@RequestHeader(ContextShareIt.HEADER_USER_ID) Long userId,
-                                              @RequestParam String text) {
-        return itemService.searchItemsForUserWithId(userId, text);
+                                           @RequestParam String text,
+                                        @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                     @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return itemService.searchItemsForUserWithId(userId, text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

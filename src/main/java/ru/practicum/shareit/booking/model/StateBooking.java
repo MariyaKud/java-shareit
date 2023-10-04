@@ -6,5 +6,6 @@ public enum StateBooking {
     PAST,
     FUTURE,
     WAITING,
-    REJECTED
+    REJECTED,
+    UN_KNOW
 }
