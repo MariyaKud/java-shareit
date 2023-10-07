@@ -37,7 +37,7 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
 import ru.practicum.shareit.request.dto.ItemRequestDtoWithItems;
 import ru.practicum.shareit.request.service.ItemRequestService;
-import ru.practicum.shareit.validation.ContextShareIt;
+import ru.practicum.shareit.common.ContextShareIt;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

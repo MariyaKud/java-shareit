@@ -34,8 +34,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.validation.ContextShareIt;
-import ru.practicum.shareit.validation.Create;
+import ru.practicum.shareit.common.ContextShareIt;
+import ru.practicum.shareit.common.Create;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

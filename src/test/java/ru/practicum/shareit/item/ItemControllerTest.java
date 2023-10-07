@@ -38,9 +38,9 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.validation.ContextShareIt;
-import ru.practicum.shareit.validation.Create;
-import ru.practicum.shareit.validation.Update;
+import ru.practicum.shareit.common.ContextShareIt;
+import ru.practicum.shareit.common.Create;
+import ru.practicum.shareit.common.Update;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

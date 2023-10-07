@@ -3,8 +3,8 @@ package ru.practicum.shareit.user.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.validation.Create;
-import ru.practicum.shareit.validation.Update;
+import ru.practicum.shareit.common.Create;
+import ru.practicum.shareit.common.Update;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

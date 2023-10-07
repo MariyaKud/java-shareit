@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import ru.practicum.shareit.validation.StartBeforeEnd;
+import ru.practicum.shareit.common.StartBeforeEnd;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.validation.Create;
-import ru.practicum.shareit.validation.Update;
+import ru.practicum.shareit.common.Create;
+import ru.practicum.shareit.common.Update;
 
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Positive;

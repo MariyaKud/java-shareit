@@ -16,7 +16,7 @@ import ru.practicum.shareit.booking.model.StatusBooking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemDtoShort;
 import ru.practicum.shareit.user.dto.UserDtoShort;
-import ru.practicum.shareit.validation.ContextShareIt;
+import ru.practicum.shareit.common.ContextShareIt;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

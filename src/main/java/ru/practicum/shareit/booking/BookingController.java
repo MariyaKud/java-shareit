@@ -16,7 +16,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.model.StateBooking;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.validation.ContextShareIt;
+import ru.practicum.shareit.common.ContextShareIt;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;

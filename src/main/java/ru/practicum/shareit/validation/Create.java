@@ -1,4 +1,4 @@
-package ru.practicum.shareit.validation;
+package ru.practicum.shareit.common;
 
 public interface Create {
 }

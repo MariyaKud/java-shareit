@@ -14,7 +14,7 @@ import ru.practicum.shareit.booking.exeption.NoAccessBooking;
 import ru.practicum.shareit.booking.exeption.NotCorrectApproved;
 import ru.practicum.shareit.item.exeption.ItemBelongsAnotherOwner;
 import ru.practicum.shareit.item.exeption.ItemUnavailable;
-import ru.practicum.shareit.validation.ContextShareIt;
+import ru.practicum.shareit.common.ContextShareIt;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
