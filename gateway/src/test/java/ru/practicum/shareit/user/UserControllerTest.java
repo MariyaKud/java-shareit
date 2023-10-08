@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.practicum.shareit.client.ContextShareIt;
 import ru.practicum.shareit.user.dto.UserDto;
 
 @DisplayName("User controller")
@@ -39,10 +40,6 @@ class UserControllerTest {
     private ObjectMapper mapper;
 
     public static final long userId = 1L;
-
-    public static final Integer from = 0;
-
-    public static final Integer size = 10;
 
     private final UserDto userDto = new UserDto(1L,"John","john.doe@mail.com");
 
@@ -108,12 +105,12 @@ class UserControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(get("/users")
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size))
+                        .param("from", String.valueOf(ContextShareIt.from))
+                        .param("size", String.valueOf(ContextShareIt.size))
                 )
                 .andExpect(status().isOk());
 
-        verify(userClient, times(1)).getUsers(from, size);
+        verify(userClient, times(1)).getUsers(ContextShareIt.from, ContextShareIt.size);
     }
 
     @Test
@@ -124,7 +121,7 @@ class UserControllerTest {
 
         mockMvc.perform(get("/users")
                         .param("from", String.valueOf(-1))
-                        .param("size", String.valueOf(size))
+                        .param("size", String.valueOf(ContextShareIt.size))
                 )
                 .andExpect(status().isInternalServerError());
 
@@ -138,7 +135,7 @@ class UserControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(get("/users")
-                        .param("from", String.valueOf(from))
+                        .param("from", String.valueOf(ContextShareIt.from))
                         .param("size", String.valueOf(0))
                 )
                 .andExpect(status().isInternalServerError());

@@ -22,13 +22,13 @@ class UserDtoJsonTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final UserDto userDto = new UserDto(1L, "John", "john.doe@mail.com");
+    private final UserDto dto = new UserDto(1L, "John", "john.doe@mail.com");
 
     @Test
     @DisplayName("should serialize")
     void testSerialize() throws Exception {
 
-        JsonContent<UserDto> result = jacksonTester.write(userDto);
+        JsonContent<UserDto> result = jacksonTester.write(dto);
 
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("John");
@@ -38,12 +38,12 @@ class UserDtoJsonTest {
     @Test
     @DisplayName("should deserialize")
     void testDeserialize() throws IOException {
-        final String userDtoJson = objectMapper.writeValueAsString(userDto);
+        final String dtoJson = objectMapper.writeValueAsString(dto);
 
-        var dto = jacksonTester.parseObject(userDtoJson);
+        var dtoTest = jacksonTester.parseObject(dtoJson);
 
-        AssertionsForClassTypes.assertThat(dto).extracting("id").isEqualTo(userDto.getId());
-        AssertionsForClassTypes.assertThat(dto).extracting("name").isEqualTo(userDto.getName());
-        AssertionsForClassTypes.assertThat(dto).extracting("email").isEqualTo(userDto.getEmail());
+        AssertionsForClassTypes.assertThat(dtoTest).extracting("id").isEqualTo(dto.getId());
+        AssertionsForClassTypes.assertThat(dtoTest).extracting("name").isEqualTo(dto.getName());
+        AssertionsForClassTypes.assertThat(dtoTest).extracting("email").isEqualTo(dto.getEmail());
     }
 }
