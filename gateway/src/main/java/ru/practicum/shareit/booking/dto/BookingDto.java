@@ -18,6 +18,5 @@ public class BookingDto {
 	private long itemId;
 	@FutureOrPresent
 	private LocalDateTime start;
-	@Future
 	private LocalDateTime end;
 }
