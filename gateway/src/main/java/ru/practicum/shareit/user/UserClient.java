@@ -32,7 +32,7 @@ public class UserClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return get("?from={from}&size={size}", null , parameters);
+        return get("?from={from}&size={size}", null, parameters);
     }
 
     public ResponseEntity<Object> createUser(UserDto userDto) {
